@@ -18,29 +18,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A reduced version of the TLS Scan, which does not test for vulnerabilities.
+ * A simple scan using TLS Scanner to generate a site report.
  *
  * @author janis.fliegenschmidt@rub.de
  */
-public class FriendlyTlsScan extends TlsScan {
-    private static Logger LOG = LoggerFactory.getLogger(PingScan.class);
-
-    private static final String SCAN_NAME = "friendly_scan";
+public class TestScan implements IScan {
+    private static Logger LOG = LoggerFactory.getLogger(TestScan.class);
 
     @Override
     public String getName() {
-        return this.SCAN_NAME;
+        return "test_scan";
     }
 
     @Override
     public IScanResult scan(String slaveInstanceId, IScanTarget target) {
         LOG.trace("scan()");
 
-        GeneralDelegate generalDelegate = new GeneralDelegate();
-        generalDelegate.setLogLevel(null);
-
-        ScannerConfig config = new ScannerConfig(generalDelegate);
-        config.setDangerLevel(4);
+        ScannerConfig config = new ScannerConfig(new GeneralDelegate());
         config.setThreads(1);
 
         int port = 443;
@@ -50,10 +44,9 @@ public class FriendlyTlsScan extends TlsScan {
 
         SiteReport report = scanner.scan();
 
-        IScanResult result = new ScanResult(SCAN_NAME);
+        IScanResult result = new ScanResult(this.getName());
         result.addString(SLAVE_INSTANCE_ID, slaveInstanceId);
-
-        populateScanResultFromSiteReport(result, report);
+        result.addString("ergebnis", report.getStringReport());
 
         return result;
     }
