@@ -5,12 +5,9 @@
  *
  * Copyright 2017 Ruhr-University Bochum
  */
-package de.rub.nds.tlscrawler;
+package de.rub.nds.tlscrawler.options;
 
-import com.google.devtools.common.options.Option;
-import com.google.devtools.common.options.OptionsBase;
-import com.google.devtools.common.options.OptionsParser;
-import com.google.devtools.common.options.OptionsParsingException;
+import com.google.devtools.common.options.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,20 +49,65 @@ public class StartupOptions extends OptionsBase {
     public String instanceId;
 
     @Option(
-            name = "mongoDbConnectionString",
+            name = "mongoDbHost",
             abbrev = 'o',
-            help = "Connection string of the MongoDB instance this crawler saves to.",
-            defaultValue = ""
+            help = "Host of the MongoDB instance this crawler saves to.",
+            defaultValue = "localhost"
     )
-    public String mongoDbConnectionString;
+    public String mongoDbHost;
 
     @Option(
-            name = "redisConnectionString",
-            abbrev = 'r',
-            help = "Connection string of the Redis instance this crawler uses to coordinate.",
+            name = "mongoDbPort",
+            abbrev = 'p',
+            help = "Port of the MongoDB instance this crawler saves to.",
+            defaultValue = "27017"
+    )
+    public int mongoDbPort;
+
+    @Option(
+            name = "mongoDbUser",
+            help = "The username to be used to authenticate with the MongoDB instance.",
             defaultValue = ""
     )
-    public String redisConnectionString;
+    public String mongoDbUser;
+
+    @Option(
+            name = "mongoDbPass",
+            help = "The passwort to be used to authenticate with MongoDB.",
+            defaultValue = ""
+    )
+    public String mongoDbPass;
+
+    @Option(
+            name = "mongoDbAuthSource",
+            help = "The DB within the MongoDB instance, in which the user:pass is defined.",
+            defaultValue = ""
+    )
+    public String mongoDbAuthSource;
+
+    @Option(
+            name = "redisHost",
+            abbrev = 'r',
+            help = "Host of the Redis instance this crawler uses to coordinate.",
+            defaultValue = "localhost"
+    )
+    public String redisHost;
+
+    @Option(
+            name = "redisPort",
+            abbrev = 'q',
+            help = "Port of the Redis instance this crawler uses to coordinate.",
+            defaultValue = "6379"
+    )
+    public int redisPort;
+
+    @Option(
+            name = "redisPass",
+            abbrev = 'a',
+            help = "Password of the Redis instance this crawler uses to coordinate.",
+            defaultValue = ""
+    )
+    public String redisPass;
 
     @Option(
             name = "masterOnly",
@@ -92,20 +134,20 @@ public class StartupOptions extends OptionsBase {
     public boolean testMode;
 
     @Option(
+            name = "multipleTestsMode",
+            abbrev = 'n',
+            help = "Performs multiple scans in a row",
+            defaultValue = "false"
+    )
+    public boolean multipleTestsMode;
+    
+    @Option(
             name = "workspace",
             abbrev = 'w',
             help = "Instances in the same workspace share the same databases.",
             defaultValue = ""
     )
     public String workspace;
-
-    @Option(
-            name = "multipleTestsMode",
-            abbrev = 'q',
-            help = "Performs multiple scans in a row",
-            defaultValue = "false"
-    )
-    public boolean multipleTestsMode;
 
     private static String DEFAULT_WORKSPACE = "default";
 
@@ -117,12 +159,10 @@ public class StartupOptions extends OptionsBase {
      * @throws OptionsParsingException
      */
     public static StartupOptions parseOptions(String[] args) throws OptionsParsingException {
-        StartupOptions result;
+        StartupOptions result = null;
 
         LOG.trace("parseOptions()");
-
-        parser.parse(args);
-        result = parser.getOptions(StartupOptions.class);
+        result = Options.parse(StartupOptions.class, args).getOptions();
 
         if (result != null && result.workspace.equals("")) {
             LOG.warn("No workspace name set. This might cause trouble when using " +
@@ -149,10 +189,25 @@ public class StartupOptions extends OptionsBase {
             result.inMemoryOrchestration = true;
         }
 
+        boolean saneMongoLogin = saneMongoLogin(result.mongoDbUser, result.mongoDbPass, result.mongoDbAuthSource);
+        if (result != null && !saneMongoLogin) {
+            LOG.warn("Did not specify a full set of mongo credentials (none is fine for unsecured instances).");
+        }
+
         return result;
     }
 
     public static String getHelpString() {
         return parser.describeOptions(Collections.<String, String>emptyMap(), OptionsParser.HelpVerbosity.LONG);
+    }
+
+    private static boolean saneMongoLogin(String user, String pass, String authSource) {
+        if (user.equals("") && pass.equals("") && authSource.equals("")) {
+            return true;
+        } else if (!user.equals("") && !pass.equals("") && !authSource.equals("")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

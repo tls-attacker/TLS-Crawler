@@ -1,15 +1,7 @@
-/**
- * TLS Crawler
- *
- * Licensed under Apache 2.0
- *
- * Copyright 2017 Ruhr-University Bochum
- */
 package de.rub.nds.tlscrawler;
 
 import de.rub.nds.tlscrawler.core.ITlsCrawlerSlave;
 import de.rub.nds.tlscrawler.core.TlsCrawlerMaster;
-import de.rub.nds.tlscrawler.options.NewScanOptions;
 import de.rub.nds.tlscrawler.utility.AddressIteratorFactory;
 import de.rub.nds.tlscrawler.utility.IAddressIterator;
 import org.slf4j.Logger;
@@ -18,18 +10,15 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Implements the command line interface.
- *
- * @author janis.fliegenschmidt@rub.de
- */
-public class CommandLineInterface {
+public class MultipleScansCommandLineInterface {
     private static Logger LOG = LoggerFactory.getLogger(CommandLineInterface.class);
-
-    public static void handleInput(TlsCrawlerMaster master, ITlsCrawlerSlave slave) {
+    private static long DAYS_TO_SLEEP = 1;
+    public static void handleInput(TlsCrawlerMaster master, ITlsCrawlerSlave slave) throws InterruptedException {
         LOG.trace("handleInput()");
 
         Scanner scanner = new Scanner(System.in);
@@ -50,7 +39,7 @@ public class CommandLineInterface {
                 case "newscan":
                     handleNewscan(master, args);
 
-                break;
+                    break;
 
                 case "exit": {
                     // TODO: Graceful teardown
@@ -71,8 +60,8 @@ public class CommandLineInterface {
         }
     }
 
-    private static void handleNewscan(TlsCrawlerMaster master, String[] args) {
-        NewScanOptions options = NewScanOptions.parseOptions(args);
+    private static void handleNewscan(TlsCrawlerMaster master, String[] args) throws InterruptedException {
+        MultipleScansNewScanOptions options = MultipleScansNewScanOptions.parseOptions(args);
 
         if (options.help) {
             LOG.info(NewScanOptions.getHelpString());
@@ -84,6 +73,27 @@ public class CommandLineInterface {
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
 
+        int numberOfScans = -1;
+
+        if (!options.numberOfScans.equals("inf")) {
+            numberOfScans = Integer.parseInt(options.numberOfScans);
+        }
+
+        int iteration = 0;
+
+        while (iteration != numberOfScans) {
+            LOG.info("Starting Test No " + (iteration+1));
+            crawl(options, master, chosenScans, ports);
+            iteration++;
+            options.id = UUID.randomUUID().toString();
+            LOG.info("Test No " + iteration + " ended. Waiting" + Long.toString(DAYS_TO_SLEEP) + "days...");
+            TimeUnit.MINUTES.sleep(DAYS_TO_SLEEP);
+
+        }
+
+    }
+
+    private static IAddressIterator setUpTargets(MultipleScansNewScanOptions options){
         AddressIteratorFactory addrFac = AddressIteratorFactory.getInstance();
         IAddressIterator targets;
         if (options.targetsFromRedisList.isEmpty()) {
@@ -101,6 +111,13 @@ public class CommandLineInterface {
             targets = AddressIteratorFactory.getRedisAddressSource(options.targetsFromRedisList);
         }
 
+        return targets;
+    }
+
+    private static void crawl(MultipleScansNewScanOptions options, TlsCrawlerMaster master,
+                       List<String> chosenScans, List<Integer> ports) {
+        IAddressIterator targets = setUpTargets(options);
         master.crawl(chosenScans, targets, ports, options.id);
     }
+
 }
