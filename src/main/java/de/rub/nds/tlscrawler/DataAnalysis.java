@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.rub.nds.tlscrawler.core;
-
-import de.rub.nds.tlscrawler.scans.IScan;
+package de.rub.nds.tlscrawler;
 
 /**
  *
  * @author robert
  */
-public interface IScanProvider {
-    public IScan getCurrentScan();
+public class DataAnalysis {
+    
 }
