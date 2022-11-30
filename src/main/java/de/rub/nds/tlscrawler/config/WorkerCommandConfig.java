@@ -28,6 +28,9 @@ public class WorkerCommandConfig {
     @Parameter(names = "-parallelProbeThreads", description = "Number of worker threads the crawler slave should use.")
     private int parallelProbeThreads = 20;
 
+    @Parameter(names = "-outputFolder", description = "Output folder for csv and pcap files of CensorScanner.")
+    private String outputFolder = "/tmp/output";
+
     @Parameter(names = "-scanTimeout",
         description = "Overall timeout for one scan in ms. (Default 14 minutes)"
             + "Has to be lower than rabbitMq consumerAck timeout (default 15min) or else rabbitMq connection will be closed if scan takes longer."
@@ -53,6 +56,10 @@ public class WorkerCommandConfig {
 
     public int getParallelProbeThreads() {
         return parallelProbeThreads;
+    }
+
+    public String getOutputFolder() {
+        return outputFolder;
     }
 
     public int getScanTimeout() {

@@ -12,9 +12,11 @@ package de.rub.nds.tlscrawler.core;
 import de.rub.nds.tlscrawler.config.WorkerCommandConfig;
 import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
+import de.rub.nds.tlscrawler.scans.DirectCensorScan;
 import de.rub.nds.tlscrawler.scans.PingScan;
 import de.rub.nds.tlscrawler.scans.Scan;
 import de.rub.nds.tlscrawler.scans.TlsScan;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +32,7 @@ public class Worker extends TlsCrawler {
     private final int maxThreadCount;
     private final int parallelProbeThreads;
     private final int scanTimeout;
+    private final String outputFolder;
 
     private final ThreadPoolExecutor executor;
     private final ThreadPoolExecutor timeoutExecutor;
@@ -43,13 +46,13 @@ public class Worker extends TlsCrawler {
      *                              A non-null orchestration provider.
      * @param persistenceProvider
      *                              A non-null persistence provider.
-     *
      */
     public Worker(WorkerCommandConfig commandConfig, RabbitMqOrchestrationProvider orchestrationProvider, IPersistenceProvider persistenceProvider) {
         super(orchestrationProvider, persistenceProvider);
         this.maxThreadCount = commandConfig.getNumberOfThreads();
         this.parallelProbeThreads = commandConfig.getParallelProbeThreads();
         this.scanTimeout = commandConfig.getScanTimeout();
+        this.outputFolder = commandConfig.getOutputFolder();
 
         executor = new ThreadPoolExecutor(maxThreadCount, maxThreadCount, 5, TimeUnit.MINUTES, new LinkedBlockingDeque<>());
         timeoutExecutor = new ThreadPoolExecutor(maxThreadCount, maxThreadCount, 5, TimeUnit.MINUTES, new LinkedBlockingDeque<>());
@@ -61,6 +64,10 @@ public class Worker extends TlsCrawler {
                 case TLS:
                     this.submitWithTimeout(new TlsScan(scanJob, deliveryTag, orchestrationProvider, persistenceProvider, parallelProbeThreads));
                     break;
+                case TLS_CENSOR_DIRECT:
+                    this.submitWithTimeout(new DirectCensorScan(scanJob, deliveryTag, orchestrationProvider, persistenceProvider, outputFolder));
+                case TLS_CENSOR_ECHO:
+                    throw new NotImplementedException("Not implemented yet!");
                 case PING:
                     this.submitWithTimeout(new PingScan(scanJob, deliveryTag, orchestrationProvider, persistenceProvider));
                     break;

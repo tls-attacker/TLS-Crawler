@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.rub.nds</groupId>
+        <artifactId>protocol-toolkit-bom</artifactId>
+        <version>2.0.1</version>
+    </parent>
 
     <groupId>de.rub.nds.tlscrawler</groupId>
     <artifactId>TLS-Crawler</artifactId>
@@ -11,7 +15,7 @@
     <name>TLS-Crawler</name>
     <url>https://github.com/tls-attacker/TLS-Crawler</url>
     <inceptionYear>2018</inceptionYear>
-    
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -19,18 +23,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>rub-nexus</id>
-            <name>TLS-Attacker Internal Repository</name>
-            <url>https://hydrogen.cloud.nds.rub.de/nexus/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <developers>
         <developer>
@@ -86,47 +78,34 @@
         <url>https://github.com/tls-attacker/TLS-Crawler</url>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>rub-nexus</id>
+            <name>TLS-Attacker Internal Repository</name>
+            <url>https://hydrogen.cloud.nds.rub.de/nexus/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+        <!-- We redefine the signature generation process, which is enabled by default,
+        but cannot be performed by typical users. Enable it using -Dskip.signature=false -->
+        <skip.signature>true</skip.signature>
+    </properties>
+
     <dependencies>
-        <!-- scope: compile -->
         <dependency>
-            <groupId>de.rub.nds.tls.scanner</groupId>
-            <artifactId>scanner-core</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.rub.nds.tls.scanner</groupId>
-            <artifactId>tls-server-scanner</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.rub.nds.tls.attacker</groupId>
-            <artifactId>tls-core</artifactId>
-            <version>4.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-core</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongojack</groupId>
-            <artifactId>mongojack</artifactId>
-            <version>4.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>jakarta.persistence</artifactId>
-            <version>2.2.3</version>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.82</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -144,21 +123,6 @@
             <version>2.13.4</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.19.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.19.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.19.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>5.16.0</version>
@@ -174,9 +138,62 @@
             <version>1.7</version>
         </dependency>
         <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.82</version>
+            <groupId>de.rub.nds.tls.attacker</groupId>
+            <artifactId>tls-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.rub.nds.tls.censor</groupId>
+            <artifactId>TLS-Censor-Scanner</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- scope: compile -->
+        <dependency>
+            <groupId>de.rub.nds.tls.scanner</groupId>
+            <artifactId>scanner-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.rub.nds.tls.scanner</groupId>
+            <artifactId>tls-server-scanner</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>jakarta.persistence</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>4.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-core</artifactId>
+            <version>4.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>4.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongojack</groupId>
+            <artifactId>mongojack</artifactId>
+            <version>4.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -209,10 +226,10 @@
                     </execution>
                     <execution>
                         <id>clean-apps-folder</id>
-                        <phase>prepare-package</phase>
                         <goals>
                             <goal>clean</goal>
                         </goals>
+                        <phase>prepare-package</phase>
                         <inherited>false</inherited>
                         <configuration>
                             <excludeDefaultDirectories>true</excludeDefaultDirectories>
@@ -292,10 +309,10 @@
                 <executions>
                     <execution>
                         <id>update-license-header</id>
-                        <phase>process-sources</phase>
                         <goals>
                             <goal>format</goal>
                         </goals>
+                        <phase>process-sources</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -344,9 +361,7 @@
                 <version>3.4.1</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
-                    <javadocExecutable>
-                        ${java.home}/bin/javadoc
-                    </javadocExecutable>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                 </configuration>
                 <executions>
                     <execution>
@@ -379,10 +394,10 @@
                 <executions>
                     <execution>
                         <id>copy</id>
-                        <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
@@ -398,10 +413,10 @@
                     </execution>
                     <execution>
                         <id>copy-dependencies</id>
-                        <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                             <outputDirectory>${maven.multiModuleProjectDirectory}/apps/lib</outputDirectory>
                             <!--Ensures only runnable dependencies are included-->
@@ -415,6 +430,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>3.0.1</version>
+                <configuration>
+                    <skip>${skip.signature}</skip>
+                </configuration>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -423,9 +441,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <skip>${skip.signature}</skip>
-                </configuration>
             </plugin>
             <!-- Install module to local Maven repository -->
             <plugin>
@@ -458,6 +473,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.2.0</version>
+                <configuration>
+                    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
+                    <violationSeverity>info</violationSeverity>
+                    <failOnViolation>false</failOnViolation>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
@@ -465,23 +485,7 @@
                         <version>10.3.1</version>
                     </dependency>
                 </dependencies>
-                <configuration>
-                    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
-                    <violationSeverity>info</violationSeverity>
-                    <failOnViolation>false</failOnViolation>
-                </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
-        <!-- We redefine the signature generation process, which is enabled by default,
-        but cannot be performed by typical users. Enable it using -Dskip.signature=false -->
-        <skip.signature>true</skip.signature>
-    </properties>
 </project>

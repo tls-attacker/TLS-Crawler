@@ -1,0 +1,45 @@
+<settings>
+    <servers>
+        <server>
+            <id>rub-nexus</id>
+            <username>${server.username}</username>
+            <password>${server.password}</password>
+        </server>
+    </servers>
+    <profiles>
+        <profile>
+            <id>protocol-attacker</id>
+            <repositories>
+                <repository>
+                    <id>default</id>
+                    <name>Maven Central</name>
+                    <url>https://repo1.maven.org/maven2/</url>
+                </repository>
+                <repository>
+                    <id>rub-nexus</id>
+                    <name>Nexus Internal Repository</name>
+                    <url>https://hydrogen.cloud.nds.rub.de/nexus/repository/maven-public/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+    <mirrors>
+        <mirror>
+            <id>rub-nexus</id>
+            <name>Nexus Interal Repository (Maven Central Mirror)</name>
+            <url>https://hydrogen.cloud.nds.rub.de/nexus/repository/maven-central/</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+    </mirrors>
+    <activeProfiles>
+        <activeProfile>protocol-attacker</activeProfile>
+    </activeProfiles>
+</settings>

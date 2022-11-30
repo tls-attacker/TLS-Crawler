@@ -10,6 +10,12 @@
 package de.rub.nds.tlscrawler.scans;
 
 public enum ScanType {
+    // Scan of a TLS server using the TLS-Scanner
     TLS,
-    PING
+    // Wether the server answers to ping
+    PING,
+    // Analyzes the reachability of a TLS-Server using Censor-Scanner
+    TLS_CENSOR_DIRECT,
+    // Analyzes the censorship between us and an ECHO server using Censor-Scanner
+    TLS_CENSOR_ECHO;
 }

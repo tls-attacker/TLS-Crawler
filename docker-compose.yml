@@ -29,6 +29,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
+        NEXUS_USERNAME: ${NEXUS_USERNAME}
+        NEXUS_PASSWORD: ${NEXUS_PASSWORD}
         GIT_USR: ${GIT_USR}
         GIT_PWD: ${GIT_PWD}
         MODVAR_BRANCH: ${MODVAR_BRANCH}
@@ -38,13 +40,14 @@ services:
         SCANNER_BRANCH: ${SCANNER_BRANCH}
     restart: "no"
     command: controller
-      -hostFile resources/text.txt
+      -hostFile resources/ips.txt
       -denylist resources/denylist.txt
       -portToBeScanned 443
       -mongoDbHost mongo -mongoDbPort 27017 -mongoDbUser mongoadmin -mongoDbPass mongoadminpw
       -mongoDbAuthSource admin
       -rabbitMqHost rabbitmq -rabbitMqPort 5672
       -scanName scanResults
+      -scanType TLS_CENSOR_DIRECT
       -monitorScan
     volumes:
       - "./resources:/resources"
@@ -58,6 +61,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
+        NEXUS_USERNAME: ${NEXUS_USERNAME}
+        NEXUS_PASSWORD: ${NEXUS_PASSWORD}
         GIT_USR: ${GIT_USR}
         GIT_PWD: ${GIT_PWD}
         MODVAR_BRANCH: ${MODVAR_BRANCH}
@@ -71,6 +76,9 @@ services:
       -rabbitMqHost rabbitmq -rabbitMqPort 5672
       -numberOfThreads 30
       -parallelProbeThreads 50
+      -outputFolder /CensorScanner/output
+    volumes:
+      - "./static_saves:/CensorScanner/output"
     networks:
       - crawler_overlay
     depends_on:
@@ -78,6 +86,7 @@ services:
         condition: service_healthy
 volumes:
   mongodata:
+  static_saves:
 
 networks:
   crawler_overlay:
