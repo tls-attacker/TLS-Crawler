@@ -1,0 +1,99 @@
+version: '2.1'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: "no"
+    ports:
+      - 127.0.0.1:5672:5672
+      - 127.0.0.1:15672:15672
+    networks:
+      - crawler_overlay
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 30s
+      retries: 5
+  mongo:
+    image: mongo:latest
+    volumes:
+      - "./mongodata:/data/db"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongoadminpw
+    ports:
+      - 127.0.0.1:27017:27017
+    networks:
+      - crawler_overlay
+  controller:
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    build:
+      context: .
+      dockerfile: Dockerfile-Censor-Scan
+      args:
+        NEXUS_USERNAME: ${NEXUS_USERNAME}
+        NEXUS_PASSWORD: ${NEXUS_PASSWORD}
+        GIT_USR: ${GIT_USR}
+        GIT_PWD: ${GIT_PWD}
+        MODVAR_BRANCH: ${MODVAR_BRANCH}
+        ASN1_BRANCH: ${ASN1_BRANCH}
+        X509_BRANCH: ${X509_BRANCH}
+        ATTACKER_BRANCH: ${ATTACKER_BRANCH}
+        SCANNER_BRANCH: ${SCANNER_BRANCH}
+    restart: "no"
+    command: controller
+      -hostFile resources/ips.txt
+      -denylist resources/denylist.txt
+      -portToBeScanned 443
+      -mongoDbHost mongo -mongoDbPort 27017 -mongoDbUser mongoadmin -mongoDbPass mongoadminpw
+      -mongoDbAuthSource admin
+      -rabbitMqHost rabbitmq -rabbitMqPort 5672
+      -scanName scanResults
+      -scanType TLS_CENSOR_DIRECT
+      -monitorScan
+    volumes:
+      - "./resources:/resources"
+    networks:
+      - crawler_overlay
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+  worker:
+    privileged: true
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    build:
+      context: .
+      dockerfile: Dockerfile-Censor-Scan
+      args:
+        NEXUS_USERNAME: ${NEXUS_USERNAME}
+        NEXUS_PASSWORD: ${NEXUS_PASSWORD}
+        GIT_USR: ${GIT_USR}
+        GIT_PWD: ${GIT_PWD}
+        MODVAR_BRANCH: ${MODVAR_BRANCH}
+        ASN1_BRANCH: ${ASN1_BRANCH}
+        X509_BRANCH: ${X509_BRANCH}
+        ATTACKER_BRANCH: ${ATTACKER_BRANCH}
+        SCANNER_BRANCH: ${SCANNER_BRANCH}
+    command: worker
+      -mongoDbHost mongo -mongoDbPort 27017
+      -mongoDbUser mongoadmin -mongoDbPass mongoadminpw -mongoDbAuthSource admin
+      -rabbitMqHost rabbitmq -rabbitMqPort 5672
+      -numberOfThreads 30
+      -parallelProbeThreads 50
+      -outputFolder /CensorScanner/output
+    volumes:
+      - "./static_saves:/CensorScanner/output"
+    networks:
+      - crawler_overlay
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+volumes:
+  mongodata:
+  static_saves:
+
+networks:
+  crawler_overlay:
