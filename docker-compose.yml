@@ -2,6 +2,8 @@ version: '2.1'
 services:
   rabbitmq:
     image: rabbitmq:3-management
+    volumes:
+      - "./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"
     restart: "no"
     ports:
       - 127.0.0.1:5672:5672
@@ -16,7 +18,7 @@ services:
   mongo:
     image: mongo:latest
     volumes:
-      - mongodata:/db/data
+      - "./mongodata:/data/db"
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongoadmin
       MONGO_INITDB_ROOT_PASSWORD: mongoadminpw
@@ -25,9 +27,12 @@ services:
     networks:
       - crawler_overlay
   controller:
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-Censor-Scan_Copy
       args:
         NEXUS_USERNAME: ${NEXUS_USERNAME}
         NEXUS_PASSWORD: ${NEXUS_PASSWORD}
@@ -50,16 +55,19 @@ services:
       -scanType TLS_CENSOR_DIRECT
       -monitorScan
     volumes:
-      - "./resources:/resources"
+      - "./TLS-Crawler/resources:/resources"
     networks:
       - crawler_overlay
     depends_on:
       rabbitmq:
         condition: service_healthy
   worker:
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-Censor-Scan_Copy
       args:
         NEXUS_USERNAME: ${NEXUS_USERNAME}
         NEXUS_PASSWORD: ${NEXUS_PASSWORD}
@@ -76,6 +84,8 @@ services:
       -rabbitMqHost rabbitmq -rabbitMqPort 5672
       -numberOfThreads 30
       -parallelProbeThreads 50
+      -timeout 3500000
+      -connectionPresets TLS12
       -outputFolder /CensorScanner/output
     volumes:
       - "./static_saves:/CensorScanner/output"

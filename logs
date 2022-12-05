@@ -1,0 +1,41 @@
+Attaching to tls-crawler_worker_1
+[36mworker_1      |[0m [32mINFO : client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync", "version": "4.7.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "5.14.0-1052-oem"}, "platform": "Java/Oracle Corporation/11.0.14+9"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='mongoadmin', source='admin', password=<hidden>, mechanismProperties=<hidden>}, streamFactoryFactory=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.Jep395RecordCodecProvider@21a5fd96]}, clusterSettings={hosts=[mongo:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='30000 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, sendBufferSize=0}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, sendBufferSize=0}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=null, autoEncryptionSettings=null, contextProvider=null}
+[36mworker_1      |[0m [m[32mINFO : cluster - Cluster description not yet available. Waiting for 30000 ms before timing out
+[36mworker_1      |[0m [m[32mINFO : connection - Opened connection [connectionId{localValue:2, serverValue:1}] to mongo:27017
+[36mworker_1      |[0m [m[32mINFO : cluster - Monitor thread successfully connected to server with description ServerDescription{address=mongo:27017, type=STANDALONE, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=13, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=39375976}
+[36mworker_1      |[0m [m[32mINFO : connection - Opened connection [connectionId{localValue:1, serverValue:2}] to mongo:27017
+[36mworker_1      |[0m [m[32mINFO : MongoPersistenceProvider - MongoDB persistence provider initialized, connected to mongodb://mongo:27017.
+[36mworker_1      |[0m [m[1;31mERROR: ForgivingExceptionHandler - Consumer com.rabbitmq.client.impl.recovery.AutorecoveringChannel$2@71bfc2b7 (amq.ctag-KxgAjsJMO5Uzm8fZ5-nPNQ) method handleDelivery for channel AMQChannel(amqp://guest@192.168.32.2:5672/,1) threw an exception for channel AMQChannel(amqp://guest@192.168.32.2:5672/,1)
+[36mworker_1      |[0m org.apache.commons.lang3.NotImplementedException: Not implemented yet!
+[36mworker_1      |[0m 	at de.rub.nds.tlscrawler.core.Worker.lambda$start$0(Worker.java:75)
+[36mworker_1      |[0m 	at de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider.lambda$registerScanJobConsumer$0(RabbitMqOrchestrationProvider.java:87)
+[36mworker_1      |[0m 	at com.rabbitmq.client.impl.recovery.AutorecoveringChannel$2.handleDelivery(AutorecoveringChannel.java:588)
+[36mworker_1      |[0m 	at com.rabbitmq.client.impl.ConsumerDispatcher$5.run(ConsumerDispatcher.java:149)
+[36mworker_1      |[0m 	at com.rabbitmq.client.impl.ConsumerWorkService$WorkPoolRunnable.run(ConsumerWorkService.java:111)
+[36mworker_1      |[0m 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+[36mworker_1      |[0m 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+[36mworker_1      |[0m 	at java.base/java.lang.Thread.run(Unknown Source)
+[36mworker_1      |[0m [m[32mINFO : DirectCensorScan - Started scanning '182.131.26.231' (NORMAL)
+[36mworker_1      |[0m [m[32mINFO : ServerScan - Starting scan on CNNIC_2(182.131.26.231)
+[36mworker_1      |[0m [m[32mINFO : NativeMappings - Pcap4J successfully loaded a native pcap library: libpcap version 1.10.0 (with TPACKET_V3)
+[36mworker_1      |[0m [m[32mINFO : PropertiesLoader - [org/pcap4j/pcap4j.properties] Could not get value by org.pcap4j.af.inet, use default value: 2
+[36mworker_1      |[0m [m[32mINFO : PropertiesLoader - [org/pcap4j/pcap4j.properties] Could not get value by org.pcap4j.af.inet6, use default value: 10
+[36mworker_1      |[0m [m[32mINFO : PropertiesLoader - [org/pcap4j/pcap4j.properties] Could not get value by org.pcap4j.af.packet, use default value: 17
+[36mworker_1      |[0m [m[32mINFO : PropertiesLoader - [org/pcap4j/pcap4j.properties] Could not get value by org.pcap4j.af.link, use default value: 18
+[36mworker_1      |[0m [m[32mINFO : Pcaps - 8 NIF(s) found.
+[36mworker_1      |[0m [m[32mINFO : PropertiesLoader - [org/pcap4j/pcap4j.properties] Could not get value by org.pcap4j.dlt.raw, use default value: 12
+[36mworker_1      |[0m [m[32mINFO : PcapHandle - Starting loop.
+[36mworker_1      |[0m [m[32mINFO : ServerScan - Starting analysis of Connection: TLS1.2
+[36mworker_1      |[0m [m[33mWARN : PacketFactories - No PacketFactoryBinder is available. All packets will be captured as UnknownPacket.
+[36mworker_1      |[0m [m[32mINFO : PcapHandle - Break loop.
+[36mworker_1      |[0m [m[32mINFO : PcapHandle - Broken.
+[36mworker_1      |[0m [m[32mINFO : PcapHandle - Starting dispatch.
+[36mworker_1      |[0m [m[32mINFO : PcapHandle - Finish dispatch.
+[36mworker_1      |[0m [m[32mINFO : PcapDumper - Closed.
+[36mworker_1      |[0m [m[32mINFO : PcapHandle - Closed.
+[36mworker_1      |[0m [m[32mINFO : ServerScan - Finished scan on CNNIC_2(182.131.26.231)
+[36mworker_1      |[0m [m[32mINFO : DirectCensorScan - Finished scanning '182.131.26.231' (NORMAL) in 34 s
+[36mworker_1      |[0m [m[32mINFO : MongoPersistenceProvider - Writing result for null into collection: scanResults_2022-12-02_13-32
+[36mworker_1      |[0m [m[32mINFO : MongoPersistenceProvider - Init database: scanResults.
+[36mworker_1      |[0m [m[32mINFO : MongoPersistenceProvider - Init collection: scanResults_2022-12-02_13-32.
+[36mworker_1      |[0m [m[32mINFO : connection - Opened connection [connectionId{localValue:3, serverValue:6}] to mongo:27017

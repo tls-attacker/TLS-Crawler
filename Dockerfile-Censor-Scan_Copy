@@ -1,0 +1,15 @@
+FROM openjdk:11-jre-slim
+
+RUN apt-get update
+# install pcap4j dependency
+RUN apt-get install libpcap-dev -y && \
+    apt-get install libcap2-bin -y
+
+RUN setcap cap_net_raw,cap_net_admin=eip usr/local/openjdk-11/bin/java
+
+# copy dependencies
+COPY ./TLS-Crawler/apps/lib /lib
+COPY ./TLS-Crawler/apps/*.jar TLS-Crawler.jar
+
+
+ENTRYPOINT ["java", "-jar", "TLS-Crawler.jar"]

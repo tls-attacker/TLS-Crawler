@@ -12,13 +12,6 @@ COPY settings.xml /root/.m2/settings.xml
 
 WORKDIR /
 
-# TLS-Scanner
-RUN git clone https://$GIT_USR:$GIT_PWD@github.com/tls-attacker/Censor-Scanner-Development.git
-WORKDIR /Censor-Scanner-Development
-RUN git checkout crawlerIntegration
-RUN mvn clean install -DskipTests -Dserver.username=$NEXUS_USERNAME -Dserver.password=$NEXUS_PASSWORD
-WORKDIR /
-
 # TLS-Crawler built from this repository
 COPY ./TLS-Crawler /TLS-Crawler/
 WORKDIR /TLS-Crawler
@@ -27,11 +20,6 @@ RUN mvn clean install -DskipTests -Dserver.username=$NEXUS_USERNAME -Dserver.pas
 FROM openjdk:11-jre-slim
 
 RUN apt-get update
-# install pcap4j dependency
-RUN apt-get install libpcap-dev -y && \
-    apt-get install libcap2-bin -y
-
-RUN setcap cap_net_raw,cap_net_admin=eip usr/local/openjdk-11/bin/java
 
 COPY --from=build /root/.m2/repository/ /root/.m2/repository/
 # dirty copying of dependencies into /lib folder
@@ -40,6 +28,5 @@ RUN for i in `find /root/.m2/repository/ -iname '*.jar'`; do cp $i /lib; done
 # copy dependencies
 COPY --from=build /TLS-Crawler/apps/lib /lib
 COPY --from=build /TLS-Crawler/apps/*.jar TLS-Crawler.jar
-
 
 ENTRYPOINT ["java", "-jar", "TLS-Crawler.jar"]

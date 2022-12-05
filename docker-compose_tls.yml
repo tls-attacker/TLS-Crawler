@@ -25,12 +25,9 @@ services:
     networks:
       - crawler_overlay
   controller:
-    cap_add:
-      - NET_RAW
-      - NET_ADMIN
     build:
       context: .
-      dockerfile: Dockerfile-Censor-Scan
+      dockerfile: Dockerfile-Tls-Scan
       args:
         NEXUS_USERNAME: ${NEXUS_USERNAME}
         NEXUS_PASSWORD: ${NEXUS_PASSWORD}
@@ -50,7 +47,7 @@ services:
       -mongoDbAuthSource admin
       -rabbitMqHost rabbitmq -rabbitMqPort 5672
       -scanName scanResults
-      -scanType TLS_CENSOR_DIRECT
+      -scanType TLS
       -monitorScan
     volumes:
       - "./resources:/resources"
@@ -60,10 +57,6 @@ services:
       rabbitmq:
         condition: service_healthy
   worker:
-    privileged: true
-    cap_add:
-      - NET_RAW
-      - NET_ADMIN
     build:
       context: .
       dockerfile: Dockerfile-Censor-Scan
@@ -83,7 +76,6 @@ services:
       -rabbitMqHost rabbitmq -rabbitMqPort 5672
       -numberOfThreads 30
       -parallelProbeThreads 50
-      -outputFolder /CensorScanner/output
     volumes:
       - "./static_saves:/CensorScanner/output"
     networks:

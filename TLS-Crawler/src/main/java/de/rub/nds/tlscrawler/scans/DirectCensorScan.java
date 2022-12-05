@@ -10,20 +10,23 @@
 
 package de.rub.nds.tlscrawler.scans;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import de.rub.nds.censor.config.CensorScannerConfig;
 import de.rub.nds.censor.constants.ConnectionPreset;
 import de.rub.nds.censor.execution.ServerScan;
 import de.rub.nds.censor.execution.result.ServerScanResult;
-import de.rub.nds.censor.ip.IpAddress;
-import de.rub.nds.censor.ip.Ipv4Address;
+import de.rub.nds.censor.network.AutonomousSystem;
+import de.rub.nds.censor.network.IpAddress;
+import de.rub.nds.censor.network.Ipv4Address;
+import de.rub.nds.censor.network.ServerNetworkInformation;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlscrawler.constant.Status;
 import de.rub.nds.tlscrawler.data.ScanJob;
 import de.rub.nds.tlscrawler.data.ScanResult;
 import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -52,9 +55,12 @@ public class DirectCensorScan extends Scan {
         config.setOutputFolder(outputFolder);
         String ip = scanJob.getScanTarget().getIp();
 
+        // TODO: add Autonomous System data
+        AutonomousSystem autonomousSystem = new AutonomousSystem(0, "??", "unknown");
         IpAddress chosenIp = new Ipv4Address(ip);
+        ServerNetworkInformation serverNetworkInformation = new ServerNetworkInformation(chosenIp, autonomousSystem, "unknown");
 
-        ServerScan serverScan = new ServerScan(chosenIp, config);
+        ServerScan serverScan = new ServerScan(serverNetworkInformation, config);
         LOGGER.info("Started scanning '{}' ({})", scanJob.getScanTarget(), scanJob.getScanConfig().getScannerDetail());
         ServerScanResult singleServerResult = serverScan.execute();
         LOGGER.info("Finished scanning '{}' ({}) in {} s", scanJob.getScanTarget(), scanJob.getScanConfig().getScannerDetail(),
