@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.targetlist;
 
 import java.io.File;
@@ -27,8 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Target list provider that downloads the most recent tranco list (https://tranco-list.eu/) and extracts the top x
- * hosts from it.
+ * Target list provider that downloads the most recent tranco list (https://tranco-list.eu/) and
+ * extracts the top x hosts from it.
  */
 public class TrancoListProvider implements ITargetListProvider {
 
@@ -48,7 +47,8 @@ public class TrancoListProvider implements ITargetListProvider {
         List<String> targetList;
         try {
             LOGGER.info("Downloading current Tranco list...");
-            ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(SOURCE).openStream());
+            ReadableByteChannel readableByteChannel =
+                    Channels.newChannel(new URL(SOURCE).openStream());
             FileOutputStream fileOutputStream = new FileOutputStream(ZIP_FILENAME);
             fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             fileOutputStream.close();

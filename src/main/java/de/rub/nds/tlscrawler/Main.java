@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler;
 
 import com.beust.jcommander.JCommander;
@@ -37,14 +36,24 @@ public class Main {
 
         switch (jc.getParsedCommand().toLowerCase()) {
             case "worker":
-                Worker worker = new Worker(workerCommandConfig, new RabbitMqOrchestrationProvider(workerCommandConfig.getRabbitMqDelegate()),
-                    new MongoPersistenceProvider(workerCommandConfig.getMongoDbDelegate()));
+                Worker worker =
+                        new Worker(
+                                workerCommandConfig,
+                                new RabbitMqOrchestrationProvider(
+                                        workerCommandConfig.getRabbitMqDelegate()),
+                                new MongoPersistenceProvider(
+                                        workerCommandConfig.getMongoDbDelegate()));
                 worker.start();
                 break;
             case "controller":
                 controllerCommandConfig.validate();
-                Controller controller = new Controller(controllerCommandConfig, new RabbitMqOrchestrationProvider(controllerCommandConfig.getRabbitMqDelegate()),
-                    new MongoPersistenceProvider(controllerCommandConfig.getMongoDbDelegate()));
+                Controller controller =
+                        new Controller(
+                                controllerCommandConfig,
+                                new RabbitMqOrchestrationProvider(
+                                        controllerCommandConfig.getRabbitMqDelegate()),
+                                new MongoPersistenceProvider(
+                                        controllerCommandConfig.getMongoDbDelegate()));
                 controller.start();
                 break;
             default:

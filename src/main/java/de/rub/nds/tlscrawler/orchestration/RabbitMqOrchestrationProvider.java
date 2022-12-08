@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.orchestration;
 
 import com.rabbitmq.client.Channel;
@@ -26,7 +25,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Provides all methods required for the communication with RabbitMQ for the controller and the worker.
+ * Provides all methods required for the communication with RabbitMQ for the controller and the
+ * worker.
  */
 public class RabbitMqOrchestrationProvider {
 
@@ -50,7 +50,9 @@ public class RabbitMqOrchestrationProvider {
             factory.setPassword(rabbitMqDelegate.getRabbitMqPass());
         } else if (rabbitMqDelegate.getRabbitMqPassFile() != null) {
             try {
-                factory.setPassword(Files.readAllLines(Paths.get(rabbitMqDelegate.getRabbitMqPassFile())).get(0));
+                factory.setPassword(
+                        Files.readAllLines(Paths.get(rabbitMqDelegate.getRabbitMqPassFile()))
+                                .get(0));
             } catch (IOException e) {
                 LOGGER.error("Could not read rabbitMq password file: ", e);
             }
@@ -75,7 +77,8 @@ public class RabbitMqOrchestrationProvider {
 
     public void submitScanJob(ScanJob scanJob) {
         try {
-            this.channel.basicPublish("", SCAN_JOB_QUEUE, null, SerializationUtils.serialize(scanJob));
+            this.channel.basicPublish(
+                    "", SCAN_JOB_QUEUE, null, SerializationUtils.serialize(scanJob));
         } catch (IOException e) {
             LOGGER.error("Failed to submit ScanJob: ", e);
         }
@@ -83,11 +86,13 @@ public class RabbitMqOrchestrationProvider {
 
     public void registerScanJobConsumer(ScanJobConsumer scanJobConsumer, int prefetchCount) {
         DeliverCallback deliverCallback =
-            (consumerTag, delivery) -> scanJobConsumer.consumeScanJob(SerializationUtils.deserialize(delivery.getBody()), delivery.getEnvelope().getDeliveryTag());
+                (consumerTag, delivery) ->
+                        scanJobConsumer.consumeScanJob(
+                                SerializationUtils.deserialize(delivery.getBody()),
+                                delivery.getEnvelope().getDeliveryTag());
         try {
             channel.basicQos(prefetchCount);
-            channel.basicConsume(SCAN_JOB_QUEUE, false, deliverCallback, consumerTag -> {
-            });
+            channel.basicConsume(SCAN_JOB_QUEUE, false, deliverCallback, consumerTag -> {});
         } catch (IOException e) {
             LOGGER.error("Failed to register ScanJob consumer: ", e);
         }
@@ -101,13 +106,15 @@ public class RabbitMqOrchestrationProvider {
         }
     }
 
-    public void registerDoneNotificationConsumer(DoneNotificationConsumer doneNotificationConsumer) {
+    public void registerDoneNotificationConsumer(
+            DoneNotificationConsumer doneNotificationConsumer) {
         DeliverCallback deliverCallback =
-            (consumerTag, delivery) -> doneNotificationConsumer.consumeDoneNotification(consumerTag, SerializationUtils.deserialize(delivery.getBody()));
+                (consumerTag, delivery) ->
+                        doneNotificationConsumer.consumeDoneNotification(
+                                consumerTag, SerializationUtils.deserialize(delivery.getBody()));
         try {
             channel.basicQos(1);
-            channel.basicConsume(DONE_NOTIFY_QUEUE, true, deliverCallback, consumerTag -> {
-            });
+            channel.basicConsume(DONE_NOTIFY_QUEUE, true, deliverCallback, consumerTag -> {});
         } catch (IOException e) {
             LOGGER.error("Failed to register DoneNotification consumer: ", e);
         }
@@ -115,7 +122,8 @@ public class RabbitMqOrchestrationProvider {
 
     public void notifyOfDoneScanJob(ScanJob scanJob) {
         try {
-            this.channel.basicPublish("", DONE_NOTIFY_QUEUE, null, SerializationUtils.serialize(scanJob));
+            this.channel.basicPublish(
+                    "", DONE_NOTIFY_QUEUE, null, SerializationUtils.serialize(scanJob));
         } catch (IOException e) {
             LOGGER.error("Failed to send notification for done ScanJob: ", e);
         }

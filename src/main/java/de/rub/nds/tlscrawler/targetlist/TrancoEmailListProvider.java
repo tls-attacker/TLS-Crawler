@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.targetlist;
 
 import java.util.ArrayList;
@@ -20,8 +19,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Target list provider that downloads the most recent tranco list (https://tranco-list.eu/) and extracts the top x
- * hosts from it and then searches for mail servers in the dns mx records of the hosts and returns these as targets.
+ * Target list provider that downloads the most recent tranco list (https://tranco-list.eu/) and
+ * extracts the top x hosts from it and then searches for mail servers in the dns mx records of the
+ * hosts and returns these as targets.
  */
 public class TrancoEmailListProvider implements ITargetListProvider {
 
@@ -43,7 +43,8 @@ public class TrancoEmailListProvider implements ITargetListProvider {
             for (String hold : hostList) {
                 String hostname = hold.substring(hold.lastIndexOf(',') + 1);
                 try {
-                    Attributes attributes = iDirC.getAttributes("dns:/" + hostname, new String[] { "MX" });
+                    Attributes attributes =
+                            iDirC.getAttributes("dns:/" + hostname, new String[] {"MX"});
                     Attribute attributeMX = attributes.get("MX");
 
                     if (attributeMX != null) {

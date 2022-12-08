@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.core.jobs;
 
 import de.rub.nds.tlscrawler.config.ControllerCommandConfig;
@@ -38,9 +37,12 @@ public class PublishBulkScanJob implements Job {
             JobDataMap data = context.getMergedJobDataMap();
 
             ControllerCommandConfig controllerConfig = (ControllerCommandConfig) data.get("config");
-            RabbitMqOrchestrationProvider orchestrationProvider = (RabbitMqOrchestrationProvider) data.get("orchestrationProvider");
-            IPersistenceProvider persistenceProvider = (IPersistenceProvider) data.get("persistenceProvider");
-            ITargetListProvider targetListProvider = (ITargetListProvider) data.get("targetListProvider");
+            RabbitMqOrchestrationProvider orchestrationProvider =
+                    (RabbitMqOrchestrationProvider) data.get("orchestrationProvider");
+            IPersistenceProvider persistenceProvider =
+                    (IPersistenceProvider) data.get("persistenceProvider");
+            ITargetListProvider targetListProvider =
+                    (ITargetListProvider) data.get("targetListProvider");
             IDenylistProvider denylistProvider = (IDenylistProvider) data.get("denylistProvider");
             ProgressMonitor progressMonitor = (ProgressMonitor) data.get("progressMonitor");
 
@@ -51,7 +53,12 @@ public class PublishBulkScanJob implements Job {
             // Create Bulk Scan and write to DB
             LOGGER.info("Initializing BulkScan");
             BulkScan bulkScan =
-                new BulkScan(controllerConfig.getScanName(), scanConfig, System.currentTimeMillis(), controllerConfig.isMonitored(), controllerConfig.getNotifyUrl());
+                    new BulkScan(
+                            controllerConfig.getScanName(),
+                            scanConfig,
+                            System.currentTimeMillis(),
+                            controllerConfig.isMonitored(),
+                            controllerConfig.getNotifyUrl());
 
             List<String> targetStringList = targetListProvider.getTargetList();
             bulkScan.setTargetsGiven(targetStringList.size());
@@ -64,15 +71,32 @@ public class PublishBulkScanJob implements Job {
             }
 
             // create and submit scan jobs for valid hosts
-            LOGGER.info("Filtering out denylisted hosts and hosts where the domain can not be resolved.");
-            long submittedJobs = targetStringList.parallelStream().map(targetString -> {
-                ScanTarget target = ScanTarget.fromTargetString(targetString, controllerConfig.getPort(), denylistProvider);
-                if (target != null) {
-                    orchestrationProvider
-                        .submitScanJob(new ScanJob(target, scanConfig, bulkScan.get_id(), bulkScan.isMonitored(), bulkScan.getName(), bulkScan.getCollectionName(), Status.Ready));
-                }
-                return target;
-            }).filter(Objects::nonNull).count();
+            LOGGER.info(
+                    "Filtering out denylisted hosts and hosts where the domain can not be resolved.");
+            long submittedJobs =
+                    targetStringList.parallelStream()
+                            .map(
+                                    targetString -> {
+                                        ScanTarget target =
+                                                ScanTarget.fromTargetString(
+                                                        targetString,
+                                                        controllerConfig.getPort(),
+                                                        denylistProvider);
+                                        if (target != null) {
+                                            orchestrationProvider.submitScanJob(
+                                                    new ScanJob(
+                                                            target,
+                                                            scanConfig,
+                                                            bulkScan.get_id(),
+                                                            bulkScan.isMonitored(),
+                                                            bulkScan.getName(),
+                                                            bulkScan.getCollectionName(),
+                                                            Status.Ready));
+                                        }
+                                        return target;
+                                    })
+                            .filter(Objects::nonNull)
+                            .count();
 
             bulkScan.setScanJobsPublished((int) submittedJobs);
             persistenceProvider.updateBulkScan(bulkScan);

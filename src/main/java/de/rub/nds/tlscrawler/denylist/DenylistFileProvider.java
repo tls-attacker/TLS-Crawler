@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.denylist;
 
 import de.rub.nds.tlscrawler.data.ScanTarget;
@@ -27,7 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Reads the specified denylist file. Supports hostnames, ips and complete subnets as denylist entries.
+ * Reads the specified denylist file. Supports hostnames, ips and complete subnets as denylist
+ * entries.
  */
 public class DenylistFileProvider implements IDenylistProvider {
 
@@ -49,8 +49,9 @@ public class DenylistFileProvider implements IDenylistProvider {
                 domainDenylistSet.add(denylistEntry);
             } else if (InetAddressValidator.getInstance().isValid(denylistEntry)) {
                 ipDenylistSet.add(denylistEntry);
-            } else if (denylistEntry.contains("/") && InetAddressValidator.getInstance().isValid(denylistEntry.split("/")[0])
-                && IntegerValidator.getInstance().isValid(denylistEntry.split("/")[1])) {
+            } else if (denylistEntry.contains("/")
+                    && InetAddressValidator.getInstance().isValid(denylistEntry.split("/")[0])
+                    && IntegerValidator.getInstance().isValid(denylistEntry.split("/")[1])) {
                 SubnetUtils utils = new SubnetUtils(denylistEntry);
                 cidrDenylist.add(utils.getInfo());
             }
@@ -59,7 +60,9 @@ public class DenylistFileProvider implements IDenylistProvider {
 
     @Override
     public synchronized boolean isDenylisted(ScanTarget target) {
-        return domainDenylistSet.contains(target.getHostname()) || ipDenylistSet.contains(target.getIp())
-            || cidrDenylist.stream().anyMatch(subnetInfo -> subnetInfo.isInRange(target.getIp()));
+        return domainDenylistSet.contains(target.getHostname())
+                || ipDenylistSet.contains(target.getIp())
+                || cidrDenylist.stream()
+                        .anyMatch(subnetInfo -> subnetInfo.isInRange(target.getIp()));
     }
 }

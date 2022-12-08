@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.data;
 
 import de.rub.nds.tlscrawler.core.Controller;
@@ -19,8 +18,7 @@ import javax.persistence.Id;
 
 public class BulkScan implements Serializable {
 
-    @Id
-    private String _id;
+    @Id private String _id;
 
     private String name;
 
@@ -52,10 +50,14 @@ public class BulkScan implements Serializable {
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm");
 
-    private BulkScan() {
-    }
+    private BulkScan() {}
 
-    public BulkScan(String name, ScanConfig scanConfig, long startTime, boolean monitored, String notifyUrl) {
+    public BulkScan(
+            String name,
+            ScanConfig scanConfig,
+            long startTime,
+            boolean monitored,
+            String notifyUrl) {
         this.scannerVersion = TlsServerScanner.class.getPackage().getImplementationVersion();
         this.crawlerVersion = Controller.class.getPackage().getImplementationVersion();
         this.name = name;
@@ -63,7 +65,8 @@ public class BulkScan implements Serializable {
         this.finished = false;
         this.startTime = startTime;
         this.monitored = monitored;
-        this.collectionName = name + "_" + dateFormat.format(Date.from(Instant.ofEpochMilli(startTime)));
+        this.collectionName =
+                name + "_" + dateFormat.format(Date.from(Instant.ofEpochMilli(startTime)));
         this.notifyUrl = notifyUrl;
     }
 

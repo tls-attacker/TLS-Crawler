@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.data;
 
 import de.rub.nds.tlscrawler.denylist.IDenylistProvider;
@@ -29,21 +28,19 @@ public class ScanTarget implements Serializable {
 
     private int trancoRank;
 
-    public ScanTarget() {
-    }
+    public ScanTarget() {}
 
     /**
-     * Initializes a ScanTarget object from a string that potentially contains a hostname, an ip, a port, the tranco rank.
+     * Initializes a ScanTarget object from a string that potentially contains a hostname, an ip, a
+     * port, the tranco rank.
      *
-     * @param  targetString
-     *                          from which to create the ScanTarget object
-     * @param  defaultPort
-     *                          that used if no port is present in targetString
-     * @param  denylistProvider
-     *                          which provides info if a host is denylisted
-     * @return                  ScanTarget object
+     * @param targetString from which to create the ScanTarget object
+     * @param defaultPort that used if no port is present in targetString
+     * @param denylistProvider which provides info if a host is denylisted
+     * @return ScanTarget object
      */
-    public static ScanTarget fromTargetString(String targetString, int defaultPort, IDenylistProvider denylistProvider) {
+    public static ScanTarget fromTargetString(
+            String targetString, int defaultPort, IDenylistProvider denylistProvider) {
         ScanTarget target;
         try {
             target = new ScanTarget();
@@ -87,7 +84,8 @@ public class ScanTarget implements Serializable {
                 LOGGER.error("Host {} is blacklisted and will not be scanned.", targetString);
             }
         } catch (UnknownHostException e) {
-            LOGGER.error("Host {} is unknown or can not be reached with error {}.", targetString, e);
+            LOGGER.error(
+                    "Host {} is unknown or can not be reached with error {}.", targetString, e);
             return null;
         }
         return target;

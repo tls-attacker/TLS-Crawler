@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.data;
 
 import de.rub.nds.scanner.core.constants.ScannerDetail;
@@ -28,10 +27,15 @@ public class ScanConfig implements Serializable {
 
     private StarttlsType starttlsType;
 
-    private ScanConfig() {
-    }
+    private ScanConfig() {}
 
-    public ScanConfig(ScanType scanType, int defaultPort, ScannerDetail scannerDetail, int reexecutions, int timeout, StarttlsType starttlsType) {
+    public ScanConfig(
+            ScanType scanType,
+            int defaultPort,
+            ScannerDetail scannerDetail,
+            int reexecutions,
+            int timeout,
+            StarttlsType starttlsType) {
         this.scanType = scanType;
         this.defaultPort = defaultPort;
         this.scannerDetail = scannerDetail;

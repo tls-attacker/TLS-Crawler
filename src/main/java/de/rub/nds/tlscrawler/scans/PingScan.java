@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.scans;
 
 import de.rub.nds.tlscrawler.data.ScanJob;
@@ -28,7 +27,11 @@ public class PingScan extends Scan {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int timeOutMs = 5000;
 
-    public PingScan(ScanJob scanJob, long rabbitMqAckTag, RabbitMqOrchestrationProvider orchestrationProvider, IPersistenceProvider persistenceProvider) {
+    public PingScan(
+            ScanJob scanJob,
+            long rabbitMqAckTag,
+            RabbitMqOrchestrationProvider orchestrationProvider,
+            IPersistenceProvider persistenceProvider) {
         super(scanJob, rabbitMqAckTag, orchestrationProvider, persistenceProvider);
     }
 
@@ -67,7 +70,10 @@ public class PingScan extends Scan {
             result.put("unreachablePorts", new ArrayList<>(scanJob.getScanTarget().getPort()));
         }
 
-        persistenceProvider.insertScanResult(new ScanResult(scanJob.getBulkScanId(), scanJob.getScanTarget(), result), scanJob.getDbName(), scanJob.getCollectionName());
+        persistenceProvider.insertScanResult(
+                new ScanResult(scanJob.getBulkScanId(), scanJob.getScanTarget(), result),
+                scanJob.getDbName(),
+                scanJob.getCollectionName());
 
         if (scanJob.isMonitored()) {
             orchestrationProvider.notifyOfDoneScanJob(scanJob);

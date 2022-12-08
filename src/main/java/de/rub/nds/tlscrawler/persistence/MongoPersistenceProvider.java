@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.persistence;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -46,9 +45,18 @@ public class MongoPersistenceProvider implements IPersistenceProvider {
     private final Map<String, JacksonMongoCollection<ScanResult>> collectionByDbAndCollectionName;
     private JacksonMongoCollection<BulkScan> bulkScanCollection;
 
-    /** Initialize connection to mongodb and setup MongoJack PojoToBson mapper. */
+    /**
+     * Initialize connection to mongodb and setup MongoJack PojoToBson mapper.
+     *
+     * @param mongoDbDelegate Mongodb command line configuration parameters
+     */
     public MongoPersistenceProvider(MongoDbDelegate mongoDbDelegate) {
-        ConnectionString connectionString = new ConnectionString("mongodb://" + mongoDbDelegate.getMongoDbHost() + ":" + mongoDbDelegate.getMongoDbPort());
+        ConnectionString connectionString =
+                new ConnectionString(
+                        "mongodb://"
+                                + mongoDbDelegate.getMongoDbHost()
+                                + ":"
+                                + mongoDbDelegate.getMongoDbPort());
         String pw = "";
         if (mongoDbDelegate.getMongoDbPass() != null) {
             pw = mongoDbDelegate.getMongoDbPass();
@@ -60,7 +68,11 @@ public class MongoPersistenceProvider implements IPersistenceProvider {
             }
         }
 
-        MongoCredential credentials = MongoCredential.createCredential(mongoDbDelegate.getMongoDbUser(), mongoDbDelegate.getMongoDbAuthSource(), pw.toCharArray());
+        MongoCredential credentials =
+                MongoCredential.createCredential(
+                        mongoDbDelegate.getMongoDbUser(),
+                        mongoDbDelegate.getMongoDbAuthSource(),
+                        pw.toCharArray());
 
         this.mapper = new ObjectMapper();
         LOGGER.trace("Constructor()");
@@ -74,9 +86,14 @@ public class MongoPersistenceProvider implements IPersistenceProvider {
         mapper.registerModule(module);
         mapper.registerModule(new JavaTimeModule());
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configOverride(BigDecimal.class).setFormat(JsonFormat.Value.forShape(JsonFormat.Shape.STRING));
+        mapper.configOverride(BigDecimal.class)
+                .setFormat(JsonFormat.Value.forShape(JsonFormat.Shape.STRING));
 
-        MongoClientSettings mongoClientSettings = MongoClientSettings.builder().credential(credentials).applyConnectionString(connectionString).build();
+        MongoClientSettings mongoClientSettings =
+                MongoClientSettings.builder()
+                        .credential(credentials)
+                        .applyConnectionString(connectionString)
+                        .build();
         this.mongoClient = MongoClients.create(mongoClientSettings);
 
         try {
@@ -90,13 +107,11 @@ public class MongoPersistenceProvider implements IPersistenceProvider {
     }
 
     /**
-     * On first call creates a collection with the specified name for the specified database and saves it in a hashmap. On
-     * repeating calls with same parameters returns the saved collection.
+     * On first call creates a collection with the specified name for the specified database and
+     * saves it in a hashmap. On repeating calls with same parameters returns the saved collection.
      *
-     * @param dbName
-     *                       Name of the database to use.
-     * @param collectionName
-     *                       Name of the collection to create/return
+     * @param dbName Name of the database to use.
+     * @param collectionName Name of the collection to create/return
      */
     private JacksonMongoCollection<ScanResult> getCollection(String dbName, String collectionName) {
         if (collectionByDbAndCollectionName.containsKey(dbName + collectionName)) {
@@ -107,7 +122,13 @@ public class MongoPersistenceProvider implements IPersistenceProvider {
             LOGGER.info("Init collection: {}.", collectionName);
 
             JacksonMongoCollection<ScanResult> collection =
-                JacksonMongoCollection.builder().withObjectMapper(mapper).build(database, collectionName, ScanResult.class, UuidRepresentation.STANDARD);
+                    JacksonMongoCollection.builder()
+                            .withObjectMapper(mapper)
+                            .build(
+                                    database,
+                                    collectionName,
+                                    ScanResult.class,
+                                    UuidRepresentation.STANDARD);
             collectionByDbAndCollectionName.put(dbName + collectionName, collection);
 
             return collection;
@@ -117,7 +138,14 @@ public class MongoPersistenceProvider implements IPersistenceProvider {
     private JacksonMongoCollection<BulkScan> getBulkScanCollection(String dbName) {
         if (this.bulkScanCollection == null) {
             MongoDatabase database = this.mongoClient.getDatabase(dbName);
-            this.bulkScanCollection = JacksonMongoCollection.builder().withObjectMapper(mapper).build(database, "bulkScans", BulkScan.class, UuidRepresentation.STANDARD);
+            this.bulkScanCollection =
+                    JacksonMongoCollection.builder()
+                            .withObjectMapper(mapper)
+                            .build(
+                                    database,
+                                    "bulkScans",
+                                    BulkScan.class,
+                                    UuidRepresentation.STANDARD);
         }
         return this.bulkScanCollection;
     }
@@ -134,16 +162,19 @@ public class MongoPersistenceProvider implements IPersistenceProvider {
     }
 
     /**
-     * Inserts the task into a collection named after the scan and a database named after the workspace of the scan.
+     * Inserts the task into a collection named after the scan and a database named after the
+     * workspace of the scan.
      *
-     * @param scanResult
-     *                   The new scan task.
+     * @param scanResult The new scan task.
      */
     @Override
     public void insertScanResult(ScanResult scanResult, String dbName, String collectionName) {
         try {
             if (scanResult != null && scanResult.getResult() != null) {
-                LOGGER.info("Writing result for {} into collection: {}", scanResult.getScanTarget().getHostname(), collectionName);
+                LOGGER.info(
+                        "Writing result for {} into collection: {}",
+                        scanResult.getScanTarget().getHostname(),
+                        collectionName);
                 this.getCollection(dbName, collectionName).insertOne(scanResult);
             }
         } catch (Exception e) {

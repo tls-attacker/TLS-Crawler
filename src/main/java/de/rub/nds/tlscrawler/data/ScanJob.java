@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.data;
 
 import de.rub.nds.tlscrawler.constant.Status;
@@ -28,7 +27,14 @@ public class ScanJob implements Serializable {
 
     private Status status;
 
-    public ScanJob(ScanTarget scanTarget, ScanConfig scanConfig, String bulkScanId, boolean isMonitored, String dbName, String collectionName, Status status) {
+    public ScanJob(
+            ScanTarget scanTarget,
+            ScanConfig scanConfig,
+            String bulkScanId,
+            boolean isMonitored,
+            String dbName,
+            String collectionName,
+            Status status) {
         this.scanTarget = scanTarget;
         this.scanConfig = scanConfig;
         this.bulkScanId = bulkScanId;
