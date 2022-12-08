@@ -1,17 +1,13 @@
 /*
- * TLS-Crawler is able to perform large scale
- * analyses on censorship.
+ * TLS-Crawler - A TLS scanning tool to perform large scale scans with the TLS-Scanner
  *
- * Copyright 2018-2022
+ * Copyright 2018-2022 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
 package de.rub.nds.tlscrawler.scans;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.rub.nds.censor.config.CensorScannerConfig;
 import de.rub.nds.censor.constants.ConnectionPreset;
@@ -27,6 +23,8 @@ import de.rub.nds.tlscrawler.data.ScanJob;
 import de.rub.nds.tlscrawler.data.ScanResult;
 import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
