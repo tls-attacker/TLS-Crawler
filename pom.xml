@@ -123,6 +123,11 @@
             <artifactId>tls-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>de.rub.nds.tls.censor</groupId>
+            <artifactId>TLS-Censor-Scanner</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>de.rub.nds.tls.scanner</groupId>
             <artifactId>scanner-core</artifactId>
         </dependency>
@@ -133,11 +138,6 @@
         <dependency>
             <groupId>de.rub.nds.tls.scanner</groupId>
             <artifactId>tls-server-scanner</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.rub.nds.tls.censor</groupId>
-            <artifactId>TLS-Censor-Scanner</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

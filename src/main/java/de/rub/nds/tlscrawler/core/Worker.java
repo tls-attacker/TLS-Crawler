@@ -88,7 +88,14 @@ public class Worker extends TlsCrawler {
                                             parallelProbeThreads));
                             break;
                         case TLS_CENSOR_DIRECT:
-                            this.submitWithTimeout(new DirectCensorScan(scanJob, deliveryTag, orchestrationProvider, persistenceProvider, outputFolder, connectionPresets));
+                            this.submitWithTimeout(
+                                    new DirectCensorScan(
+                                            scanJob,
+                                            deliveryTag,
+                                            orchestrationProvider,
+                                            persistenceProvider,
+                                            outputFolder,
+                                            connectionPresets));
                         case TLS_CENSOR_ECHO:
                             throw new NotImplementedException("Not implemented yet!");
                         case PING:

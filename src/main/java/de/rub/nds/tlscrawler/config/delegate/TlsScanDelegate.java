@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.config.delegate;
 
 import com.beust.jcommander.Parameter;
@@ -18,10 +17,16 @@ public class TlsScanDelegate {
     @Parameter(names = "-scanDetail")
     private ScannerDetail scanDetail = ScannerDetail.NORMAL;
 
-    @Parameter(names = "-timeout", validateWith = ControllerCommandConfig.PositiveInteger.class, description = "The timeout to use inside the TLS-Scanner.")
+    @Parameter(
+            names = "-timeout",
+            validateWith = ControllerCommandConfig.PositiveInteger.class,
+            description = "The timeout to use inside the TLS-Scanner.")
     private int scannerTimeout = 2000;
 
-    @Parameter(names = "-reexecutions", validateWith = ControllerCommandConfig.PositiveInteger.class, description = "Number of reexecutions to use in the TLS-Scanner.")
+    @Parameter(
+            names = "-reexecutions",
+            validateWith = ControllerCommandConfig.PositiveInteger.class,
+            description = "Number of reexecutions to use in the TLS-Scanner.")
     private int reexecutions = 3;
 
     public ScannerDetail getScanDetail() {

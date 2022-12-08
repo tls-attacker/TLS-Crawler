@@ -1,7 +1,7 @@
 /*
  * TLS-Crawler - A TLS scanning tool to perform large scale scans with the TLS-Scanner
  *
- * Copyright 2018-2022 Paderborn University, Ruhr University Bochum
+ * Copyright 2018-2022 Ruhr University Bochum, Paderborn University, and Hackmanit GmbH
  *
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
@@ -21,11 +21,9 @@ public class WorkerCommandConfig {
 
     @ParametersDelegate private final MongoDbDelegate mongoDbDelegate;
 
-    @ParametersDelegate
-    private final TlsScanDelegate tlsScanDelegate;
+    @ParametersDelegate private final TlsScanDelegate tlsScanDelegate;
 
-    @ParametersDelegate
-    private final CensorScanDelegate censorScanDelegate;
+    @ParametersDelegate private final CensorScanDelegate censorScanDelegate;
 
     @Parameter(
             names = "-numberOfThreads",

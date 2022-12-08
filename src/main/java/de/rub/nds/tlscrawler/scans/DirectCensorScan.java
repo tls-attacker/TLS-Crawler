@@ -6,7 +6,6 @@
  * Licensed under Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
-
 package de.rub.nds.tlscrawler.scans;
 
 import de.rub.nds.censor.config.CensorScannerConfig;
@@ -37,8 +36,13 @@ public class DirectCensorScan extends Scan {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public DirectCensorScan(ScanJob scanJob, long rabbitMqAckTag, RabbitMqOrchestrationProvider orchestrationProvider, IPersistenceProvider persistenceProvider,
-        String outputFolder, List<ConnectionPreset> connectionPresets) {
+    public DirectCensorScan(
+            ScanJob scanJob,
+            long rabbitMqAckTag,
+            RabbitMqOrchestrationProvider orchestrationProvider,
+            IPersistenceProvider persistenceProvider,
+            String outputFolder,
+            List<ConnectionPreset> connectionPresets) {
         super(scanJob, rabbitMqAckTag, orchestrationProvider, persistenceProvider);
         this.outputFolder = outputFolder;
         this.connectionPresets = connectionPresets;
@@ -56,17 +60,30 @@ public class DirectCensorScan extends Scan {
         // TODO: add Autonomous System data
         AutonomousSystem autonomousSystem = new AutonomousSystem(0, "??", "unknown");
         IpAddress chosenIp = new Ipv4Address(ip);
-        ServerNetworkInformation serverNetworkInformation = new ServerNetworkInformation(chosenIp, autonomousSystem, "unknown");
+        ServerNetworkInformation serverNetworkInformation =
+                new ServerNetworkInformation(chosenIp, autonomousSystem, "unknown");
 
         ServerScan serverScan = new ServerScan(serverNetworkInformation, config);
-        LOGGER.info("Started scanning '{}' ({})", scanJob.getScanTarget(), scanJob.getScanConfig().getScannerDetail());
+        LOGGER.info(
+                "Started scanning '{}' ({})",
+                scanJob.getScanTarget(),
+                scanJob.getScanConfig().getScannerDetail());
         ServerScanResult singleServerResult = serverScan.execute();
-        LOGGER.info("Finished scanning '{}' ({}) in {} s", scanJob.getScanTarget(), scanJob.getScanConfig().getScannerDetail(),
-            (singleServerResult.getScanEndTime() - singleServerResult.getScanStartTime()) / 1000);
+        LOGGER.info(
+                "Finished scanning '{}' ({}) in {} s",
+                scanJob.getScanTarget(),
+                scanJob.getScanConfig().getScannerDetail(),
+                (singleServerResult.getScanEndTime() - singleServerResult.getScanStartTime())
+                        / 1000);
 
         if (!cancelled.get()) {
-            persistenceProvider.insertScanResult(new ScanResult(scanJob.getBulkScanId(), scanJob.getScanTarget(), this.createDocumentFromServerResult(singleServerResult)),
-                scanJob.getDbName(), scanJob.getCollectionName());
+            persistenceProvider.insertScanResult(
+                    new ScanResult(
+                            scanJob.getBulkScanId(),
+                            scanJob.getScanTarget(),
+                            this.createDocumentFromServerResult(singleServerResult)),
+                    scanJob.getDbName(),
+                    scanJob.getCollectionName());
             scanJob.setStatus(Status.DoneResultWritten);
         } else {
             scanJob.setStatus(Status.DoneNoResult);

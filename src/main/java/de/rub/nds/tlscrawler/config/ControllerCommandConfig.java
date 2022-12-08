@@ -29,11 +29,9 @@ public class ControllerCommandConfig {
 
     @ParametersDelegate private final StarttlsDelegate starttlsDelegate;
 
-    @ParametersDelegate
-    private final TlsScanDelegate tlsScanDelegate;
+    @ParametersDelegate private final TlsScanDelegate tlsScanDelegate;
 
-    @ParametersDelegate
-    private final CensorScanDelegate censorScanDelegate;
+    @ParametersDelegate private final CensorScanDelegate censorScanDelegate;
 
     @Parameter(names = "-portToBeScanned", description = "The port that should be scanned.")
     private int port = 443;
@@ -44,8 +42,11 @@ public class ControllerCommandConfig {
                     "The type of the scan. Currently supported types: TLS, PING. Default: TLS")
     private ScanType scanType = ScanType.TLS;
 
-    @Parameter(names = "-scanCronInterval", validateWith = CronSyntax.class,
-        description = "A cron expression which defines the interval of when scans are started. Leave empty to only start one scan immediately.")
+    @Parameter(
+            names = "-scanCronInterval",
+            validateWith = CronSyntax.class,
+            description =
+                    "A cron expression which defines the interval of when scans are started. Leave empty to only start one scan immediately.")
     private String scanCronInterval;
 
     @Parameter(names = "-scanName", description = "The name of the scan")

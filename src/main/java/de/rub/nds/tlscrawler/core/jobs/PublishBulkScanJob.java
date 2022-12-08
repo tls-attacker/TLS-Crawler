@@ -46,9 +46,14 @@ public class PublishBulkScanJob implements Job {
             IDenylistProvider denylistProvider = (IDenylistProvider) data.get("denylistProvider");
             ProgressMonitor progressMonitor = (ProgressMonitor) data.get("progressMonitor");
 
-            ScanConfig scanConfig = new ScanConfig(controllerConfig.getScanType(), controllerConfig.getPort(), controllerConfig.getTlsScanDelegate().getScanDetail(),
-                controllerConfig.getTlsScanDelegate().getReexecutions(), controllerConfig.getTlsScanDelegate().getScannerTimeout(),
-                controllerConfig.getStarttlsDelegate().getStarttlsType());
+            ScanConfig scanConfig =
+                    new ScanConfig(
+                            controllerConfig.getScanType(),
+                            controllerConfig.getPort(),
+                            controllerConfig.getTlsScanDelegate().getScanDetail(),
+                            controllerConfig.getTlsScanDelegate().getReexecutions(),
+                            controllerConfig.getTlsScanDelegate().getScannerTimeout(),
+                            controllerConfig.getStarttlsDelegate().getStarttlsType());
 
             // Create Bulk Scan and write to DB
             LOGGER.info("Initializing BulkScan");
