@@ -55,7 +55,7 @@ services:
       -scanType TLS_CENSOR_DIRECT
       -monitorScan
     volumes:
-      - "./TLS-Crawler/resources:/resources"
+      - "./resources:/resources"
     networks:
       - crawler_overlay
     depends_on:

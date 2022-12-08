@@ -15,7 +15,7 @@ pipeline {
         stage('Clean') {
             steps {
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
-                    sh 'mvn clean'
+                    sh 'mvn -f TLS-Crawler clean'
                 }
             }
         }
@@ -25,7 +25,7 @@ pipeline {
             }
             steps {
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
-                    sh 'mvn spotless:check'
+                    sh 'mvn -f TLS-Crawler spotless:check'
                 }
             }
         }
@@ -35,7 +35,7 @@ pipeline {
             }
             steps {
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
-                    sh 'mvn -DskipTests=true package'
+                    sh 'mvn -f TLS-Crawler -DskipTests=true package'
                 }
             }
 
@@ -60,7 +60,7 @@ pipeline {
             }
             steps {
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
-                    sh 'mvn pmd:pmd pmd:cpd spotbugs:spotbugs'
+                    sh 'mvn -f TLS-Crawler pmd:pmd pmd:cpd spotbugs:spotbugs'
                 }
             }
             post {
@@ -82,7 +82,7 @@ pipeline {
             }
             steps {
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
-                    sh 'mvn -P coverage -Dskip.failsafe.tests=true test'
+                    sh 'mvn -f TLS-Crawler -P coverage -Dskip.failsafe.tests=true test'
                 }
             }
             post {
@@ -104,7 +104,7 @@ pipeline {
             }
             steps {
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
-                    sh 'mvn -P coverage -Dskip.surefire.tests=true verify'
+                    sh 'mvn -f TLS-Crawler -P coverage -Dskip.surefire.tests=true verify'
                 }
             }
             post {
@@ -126,7 +126,7 @@ pipeline {
             steps {
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
                     // Tests were already executed separately, so disable tests within this step
-                    sh 'mvn -DskipTests=true deploy'
+                    sh 'mvn -f TLS-Crawler -DskipTests=true deploy'
                 }
             }
         }
@@ -145,8 +145,8 @@ pipeline {
                 unstash 'jar'
                 unstash 'lib'
                 withMaven(jdk: env.JDK_TOOL_NAME, maven: env.MAVEN_TOOL_NAME) {
-                    sh 'mvn dependency:get -Dartifact=co.elastic.apm:elastic-apm-agent:1.21.0'
-                    sh 'mvn dependency:copy -Dartifact=co.elastic.apm:elastic-apm-agent:1.21.0 -DoutputDirectory=.'
+                    sh 'mvn -f TLS-Crawler dependency:get -Dartifact=co.elastic.apm:elastic-apm-agent:1.21.0'
+                    sh 'mvn -f TLS-Crawler dependency:copy -Dartifact=co.elastic.apm:elastic-apm-agent:1.21.0 -DoutputDirectory=.'
                 }
                 sh 'docker build -f ci.Dockerfile -t ${DOCKER_PUSH_URL}/tls-crawler:latest -t ${DOCKER_PUSH_URL}/tls-crawler:${BUILD_TIMESTAMP}_${BUILD_NUMBER} .'
                 sh 'docker login -u $DOCKER_PUSH_USR -p $DOCKER_PUSH_PSW $DOCKER_PUSH_URL'
