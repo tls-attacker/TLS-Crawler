@@ -98,6 +98,7 @@ public class Worker extends TlsCrawler {
                                             persistenceProvider,
                                             ipRangeFile,
                                             censorScannerConfig));
+                            break;
                         case TLS_CENSOR_ECHO:
                             throw new NotImplementedException("Not implemented yet!");
                         case PING:
