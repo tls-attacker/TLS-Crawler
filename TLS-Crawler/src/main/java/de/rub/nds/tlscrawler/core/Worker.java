@@ -58,8 +58,13 @@ public class Worker extends TlsCrawler {
         this.maxThreadCount = commandConfig.getNumberOfThreads();
         this.parallelProbeThreads = commandConfig.getParallelProbeThreads();
         this.scanTimeout = commandConfig.getScanTimeout();
-        this.outputFolder = commandConfig.getCensorScanDelegate().getOutputFolder();
-        this.connectionPresets = commandConfig.getCensorScanDelegate().getConnectionPresets();
+        this.outputFolder =
+                commandConfig.getCensorScanDelegate().getCensorScannerConfig().getOutputFolder();
+        this.connectionPresets =
+                commandConfig
+                        .getCensorScanDelegate()
+                        .getCensorScannerConfig()
+                        .getConnectionPresets();
         this.ipRangeFile = ipRangeFile;
 
         executor =

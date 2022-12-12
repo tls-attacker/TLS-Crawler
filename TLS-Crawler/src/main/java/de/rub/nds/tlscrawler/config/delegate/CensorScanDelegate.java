@@ -8,12 +8,9 @@
  */
 package de.rub.nds.tlscrawler.config.delegate;
 
-import java.util.List;
-
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParametersDelegate;
 import de.rub.nds.censor.config.CensorScannerConfig;
-import de.rub.nds.censor.constants.ConnectionPreset;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 
 public class CensorScanDelegate {
