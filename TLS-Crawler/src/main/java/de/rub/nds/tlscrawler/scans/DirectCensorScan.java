@@ -21,6 +21,7 @@ import de.rub.nds.tlscrawler.data.ScanResult;
 import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
 import inet.ipaddr.IPAddressString;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -55,37 +57,46 @@ public class DirectCensorScan extends Scan {
 
     @Override
     public void run() {
-        String ip = scanJob.getScanTarget().getIp();
+        try {
+            String ip = scanJob.getScanTarget().getIp();
 
-        IpAddress chosenIp = new Ipv4Address(ip);
-        ServerNetworkInformation serverNetworkInformation =
-                new ServerNetworkInformation(
-                        chosenIp, getAutonomousSystemListFromIp(ipRangeFile, ip), "unknown");
+            IpAddress chosenIp = new Ipv4Address(ip);
+            ServerNetworkInformation serverNetworkInformation =
+                    new ServerNetworkInformation(
+                            chosenIp, getAutonomousSystemListFromIp(ipRangeFile, ip), "unknown");
 
-        ServerScan serverScan = new ServerScan(serverNetworkInformation, censorScannerConfig);
-        LOGGER.info(
-                "Started scanning '{}' ({})",
-                scanJob.getScanTarget(),
-                scanJob.getScanConfig().getScannerDetail());
-        ServerScanResult singleServerResult = serverScan.execute();
-        LOGGER.info(
-                "Finished scanning '{}' ({}) in {} s",
-                scanJob.getScanTarget(),
-                scanJob.getScanConfig().getScannerDetail(),
-                (singleServerResult.getScanEndTime() - singleServerResult.getScanStartTime())
-                        / 1000);
+            ServerScan serverScan = new ServerScan(serverNetworkInformation, censorScannerConfig);
+            LOGGER.info(
+                    "Started scanning '{}' ({})",
+                    scanJob.getScanTarget(),
+                    scanJob.getScanConfig().getScannerDetail());
+            ServerScanResult singleServerResult = serverScan.execute();
+            LOGGER.info(
+                    "Finished scanning '{}' ({}) in {} s",
+                    scanJob.getScanTarget(),
+                    scanJob.getScanConfig().getScannerDetail(),
+                    (singleServerResult.getScanEndTime() - singleServerResult.getScanStartTime())
+                            / 1000);
 
-        if (!cancelled.get()) {
-            persistenceProvider.insertScanResult(
-                    new ScanResult(
-                            scanJob.getBulkScanId(),
-                            scanJob.getScanTarget(),
-                            this.createDocumentFromServerResult(singleServerResult)),
-                    scanJob.getDbName(),
-                    scanJob.getCollectionName());
-            scanJob.setStatus(Status.DoneResultWritten);
-        } else {
-            scanJob.setStatus(Status.DoneNoResult);
+            if (!cancelled.get()) {
+                persistenceProvider.insertScanResult(
+                        new ScanResult(
+                                scanJob.getBulkScanId(),
+                                scanJob.getScanTarget(),
+                                this.createDocumentFromServerResult(singleServerResult)),
+                        scanJob.getDbName(),
+                        scanJob.getCollectionName());
+                scanJob.setStatus(Status.DoneResultWritten);
+            } else {
+                scanJob.setStatus(Status.DoneNoResult);
+            }
+        } catch (Throwable e) {
+            LOGGER.error(
+                    "Scanning of {} had to be aborted because of an exception: ",
+                    scanJob.getScanTarget(),
+                    e);
+        } finally {
+            this.cancel(false);
         }
     }
 
@@ -107,8 +118,8 @@ public class DirectCensorScan extends Scan {
      * of Ip address in different ranges and their size.
      *
      * @param ipRangeFile The file containing information about ipRanges and their Autonomous
-     *     Systems
-     * @param ip Ip Address to get autonomous systems for
+     *                    Systems
+     * @param ip          Ip Address to get autonomous systems for
      * @return List of {@link AutonomousSystem} sorted by their size
      */
     private List<AutonomousSystem> getAutonomousSystemListFromIp(String ipRangeFile, String ip) {
