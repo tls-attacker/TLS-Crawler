@@ -45,7 +45,7 @@ services:
         SCANNER_BRANCH: ${SCANNER_BRANCH}
     restart: "no"
     command: controller
-      -hostFile resources/ips.txt
+      -hostFile resources/tls_ips.txt
       -denylist resources/denylist.txt
       -portToBeScanned 443
       -mongoDbHost mongo -mongoDbPort 27017 -mongoDbUser mongoadmin -mongoDbPass mongoadminpw
@@ -79,6 +79,7 @@ services:
         ATTACKER_BRANCH: ${ATTACKER_BRANCH}
         SCANNER_BRANCH: ${SCANNER_BRANCH}
     command: worker
+      -ipRangesFile ip_range_as_map.txt
       -mongoDbHost mongo -mongoDbPort 27017
       -mongoDbUser mongoadmin -mongoDbPass mongoadminpw -mongoDbAuthSource admin
       -rabbitMqHost rabbitmq -rabbitMqPort 5672
