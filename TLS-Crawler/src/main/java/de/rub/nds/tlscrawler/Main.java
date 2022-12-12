@@ -42,7 +42,8 @@ public class Main {
                                 new RabbitMqOrchestrationProvider(
                                         workerCommandConfig.getRabbitMqDelegate()),
                                 new MongoPersistenceProvider(
-                                        workerCommandConfig.getMongoDbDelegate()));
+                                        workerCommandConfig.getMongoDbDelegate()),
+                                workerCommandConfig.getCensorScanDelegate().getIpRangesFile());
                 worker.start();
                 break;
             case "controller":

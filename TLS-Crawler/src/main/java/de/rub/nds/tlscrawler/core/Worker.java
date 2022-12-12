@@ -36,6 +36,7 @@ public class Worker extends TlsCrawler {
     // TODO: tidy up what belongs to ScanJob, ScanConfig and the Scan objects
     private final String outputFolder;
     private final List<ConnectionPreset> connectionPresets;
+    private final String ipRangeFile;
 
     private final ThreadPoolExecutor executor;
     private final ThreadPoolExecutor timeoutExecutor;
@@ -46,17 +47,20 @@ public class Worker extends TlsCrawler {
      * @param commandConfig The config for this worker.
      * @param orchestrationProvider A non-null orchestration provider.
      * @param persistenceProvider A non-null persistence provider.
+     * @param ipRangeFile
      */
     public Worker(
             WorkerCommandConfig commandConfig,
             RabbitMqOrchestrationProvider orchestrationProvider,
-            IPersistenceProvider persistenceProvider) {
+            IPersistenceProvider persistenceProvider,
+            String ipRangeFile) {
         super(orchestrationProvider, persistenceProvider);
         this.maxThreadCount = commandConfig.getNumberOfThreads();
         this.parallelProbeThreads = commandConfig.getParallelProbeThreads();
         this.scanTimeout = commandConfig.getScanTimeout();
         this.outputFolder = commandConfig.getCensorScanDelegate().getOutputFolder();
         this.connectionPresets = commandConfig.getCensorScanDelegate().getConnectionPresets();
+        this.ipRangeFile = ipRangeFile;
 
         executor =
                 new ThreadPoolExecutor(
@@ -95,7 +99,8 @@ public class Worker extends TlsCrawler {
                                             orchestrationProvider,
                                             persistenceProvider,
                                             outputFolder,
-                                            connectionPresets));
+                                            connectionPresets,
+                                            ipRangeFile));
                         case TLS_CENSOR_ECHO:
                             throw new NotImplementedException("Not implemented yet!");
                         case PING:

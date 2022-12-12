@@ -20,6 +20,11 @@ public class CensorScanDelegate {
     private String outputFolder = "/tmp/output";
 
     @Parameter(
+            names = "-ipRangesFile",
+            description = "Location of the file that contains IP ranges and AS information.")
+    private String ipRangesFile = "ip_range_as_map.txt";
+
+    @Parameter(
             names = "-connectionPresets",
             description = "List of connection presets that the scanner will consider.")
     private List<ConnectionPreset> connectionPresets =
@@ -37,5 +42,9 @@ public class CensorScanDelegate {
 
     public List<ConnectionPreset> getConnectionPresets() {
         return connectionPresets;
+    }
+
+    public String getIpRangesFile() {
+        return ipRangesFile;
     }
 }
