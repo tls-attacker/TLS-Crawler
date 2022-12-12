@@ -21,7 +21,6 @@ import de.rub.nds.tlscrawler.data.ScanResult;
 import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
 import inet.ipaddr.IPAddressString;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -118,8 +116,8 @@ public class DirectCensorScan extends Scan {
      * of Ip address in different ranges and their size.
      *
      * @param ipRangeFile The file containing information about ipRanges and their Autonomous
-     *                    Systems
-     * @param ip          Ip Address to get autonomous systems for
+     *     Systems
+     * @param ip Ip Address to get autonomous systems for
      * @return List of {@link AutonomousSystem} sorted by their size
      */
     private List<AutonomousSystem> getAutonomousSystemListFromIp(String ipRangeFile, String ip) {
