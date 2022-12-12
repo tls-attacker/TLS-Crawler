@@ -83,11 +83,13 @@ services:
       -mongoDbHost mongo -mongoDbPort 27017
       -mongoDbUser mongoadmin -mongoDbPass mongoadminpw -mongoDbAuthSource admin
       -rabbitMqHost rabbitmq -rabbitMqPort 5672
-      -numberOfThreads 30
-      -parallelProbeThreads 50
-      -timeout 3500000
-      -connectionPresets TLS12
+      -numberOfThreads 100
+      -parallelProbeThreads 100
+      -scanTimeout 3500000
       -outputFolder /CensorScanner/output
+      -censorshipAttempts 5
+      -sniHostNames twitter.com,example.org
+      -socketTimeout 30000
     volumes:
       - "./resources:/resources"
       - "./static_saves:/CensorScanner/output"
