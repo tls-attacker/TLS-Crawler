@@ -8,43 +8,32 @@
  */
 package de.rub.nds.tlscrawler.config.delegate;
 
-import com.beust.jcommander.Parameter;
-import de.rub.nds.censor.constants.ConnectionPreset;
 import java.util.List;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParametersDelegate;
+import de.rub.nds.censor.config.CensorScannerConfig;
+import de.rub.nds.censor.constants.ConnectionPreset;
+import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 
 public class CensorScanDelegate {
 
-    @Parameter(
-            names = "-outputFolder",
-            description = "Output folder for csv and pcap files of CensorScanner.")
-    private String outputFolder = "/tmp/output";
+    @ParametersDelegate private final CensorScannerConfig censorScannerConfig;
 
     @Parameter(
             names = "-ipRangesFile",
             description = "Location of the file that contains IP ranges and AS information.")
     private String ipRangesFile = "ip_range_as_map.txt";
 
-    @Parameter(
-            names = "-connectionPresets",
-            description = "List of connection presets that the scanner will consider.")
-    private List<ConnectionPreset> connectionPresets =
-            List.of(
-                    ConnectionPreset.TLS12,
-                    ConnectionPreset.RECORD_FRAG,
-                    ConnectionPreset.TLS13,
-                    ConnectionPreset.SNI,
-                    ConnectionPreset.ESNI,
-                    ConnectionPreset.ECH);
-
-    public String getOutputFolder() {
-        return outputFolder;
-    }
-
-    public List<ConnectionPreset> getConnectionPresets() {
-        return connectionPresets;
+    public CensorScanDelegate() {
+        this.censorScannerConfig = new CensorScannerConfig(new GeneralDelegate());
     }
 
     public String getIpRangesFile() {
         return ipRangesFile;
+    }
+
+    public CensorScannerConfig getCensorScannerConfig() {
+        return censorScannerConfig;
     }
 }
