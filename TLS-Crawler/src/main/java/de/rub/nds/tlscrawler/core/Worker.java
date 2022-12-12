@@ -8,7 +8,7 @@
  */
 package de.rub.nds.tlscrawler.core;
 
-import de.rub.nds.censor.constants.ConnectionPreset;
+import de.rub.nds.censor.config.CensorScannerConfig;
 import de.rub.nds.tlscrawler.config.WorkerCommandConfig;
 import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
@@ -16,7 +16,6 @@ import de.rub.nds.tlscrawler.scans.DirectCensorScan;
 import de.rub.nds.tlscrawler.scans.PingScan;
 import de.rub.nds.tlscrawler.scans.Scan;
 import de.rub.nds.tlscrawler.scans.TlsScan;
-import java.util.List;
 import java.util.concurrent.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
@@ -33,13 +32,11 @@ public class Worker extends TlsCrawler {
     private final int maxThreadCount;
     private final int parallelProbeThreads;
     private final int scanTimeout;
-    // TODO: tidy up what belongs to ScanJob, ScanConfig and the Scan objects
-    private final String outputFolder;
-    private final List<ConnectionPreset> connectionPresets;
     private final String ipRangeFile;
 
     private final ThreadPoolExecutor executor;
     private final ThreadPoolExecutor timeoutExecutor;
+    private final CensorScannerConfig censorScannerConfig;
 
     /**
      * TLS-Crawler constructor.
@@ -48,24 +45,20 @@ public class Worker extends TlsCrawler {
      * @param orchestrationProvider A non-null orchestration provider.
      * @param persistenceProvider A non-null persistence provider.
      * @param ipRangeFile
+     * @param censorScannerConfig
      */
     public Worker(
             WorkerCommandConfig commandConfig,
             RabbitMqOrchestrationProvider orchestrationProvider,
             IPersistenceProvider persistenceProvider,
-            String ipRangeFile) {
+            String ipRangeFile,
+            CensorScannerConfig censorScannerConfig) {
         super(orchestrationProvider, persistenceProvider);
         this.maxThreadCount = commandConfig.getNumberOfThreads();
         this.parallelProbeThreads = commandConfig.getParallelProbeThreads();
         this.scanTimeout = commandConfig.getScanTimeout();
-        this.outputFolder =
-                commandConfig.getCensorScanDelegate().getCensorScannerConfig().getOutputFolder();
-        this.connectionPresets =
-                commandConfig
-                        .getCensorScanDelegate()
-                        .getCensorScannerConfig()
-                        .getConnectionPresets();
         this.ipRangeFile = ipRangeFile;
+        this.censorScannerConfig = censorScannerConfig;
 
         executor =
                 new ThreadPoolExecutor(
@@ -103,9 +96,8 @@ public class Worker extends TlsCrawler {
                                             deliveryTag,
                                             orchestrationProvider,
                                             persistenceProvider,
-                                            outputFolder,
-                                            connectionPresets,
-                                            ipRangeFile));
+                                            ipRangeFile,
+                                            censorScannerConfig));
                         case TLS_CENSOR_ECHO:
                             throw new NotImplementedException("Not implemented yet!");
                         case PING:

@@ -9,14 +9,12 @@
 package de.rub.nds.tlscrawler.scans;
 
 import de.rub.nds.censor.config.CensorScannerConfig;
-import de.rub.nds.censor.constants.ConnectionPreset;
 import de.rub.nds.censor.execution.ServerScan;
 import de.rub.nds.censor.execution.result.ServerScanResult;
 import de.rub.nds.censor.network.AutonomousSystem;
 import de.rub.nds.censor.network.IpAddress;
 import de.rub.nds.censor.network.Ipv4Address;
 import de.rub.nds.censor.network.ServerNetworkInformation;
-import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlscrawler.constant.Status;
 import de.rub.nds.tlscrawler.data.ScanJob;
 import de.rub.nds.tlscrawler.data.ScanResult;
@@ -38,9 +36,8 @@ import org.bson.Document;
 public class DirectCensorScan extends Scan {
 
     private final AtomicBoolean cancelled = new AtomicBoolean(false);
-    private final String outputFolder;
-    private final List<ConnectionPreset> connectionPresets;
     private final String ipRangeFile;
+    private final CensorScannerConfig censorScannerConfig;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -49,22 +46,15 @@ public class DirectCensorScan extends Scan {
             long rabbitMqAckTag,
             RabbitMqOrchestrationProvider orchestrationProvider,
             IPersistenceProvider persistenceProvider,
-            String outputFolder,
-            List<ConnectionPreset> connectionPresets,
-            String ipRangeFile) {
+            String ipRangeFile,
+            CensorScannerConfig censorScannerConfig) {
         super(scanJob, rabbitMqAckTag, orchestrationProvider, persistenceProvider);
-        this.outputFolder = outputFolder;
-        this.connectionPresets = connectionPresets;
         this.ipRangeFile = ipRangeFile;
+        this.censorScannerConfig = censorScannerConfig;
     }
 
     @Override
     public void run() {
-        GeneralDelegate generalDelegate = new GeneralDelegate();
-        CensorScannerConfig config = new CensorScannerConfig(generalDelegate);
-        config.setConnectionPresets(connectionPresets);
-
-        config.setOutputFolder(outputFolder);
         String ip = scanJob.getScanTarget().getIp();
 
         IpAddress chosenIp = new Ipv4Address(ip);
@@ -72,7 +62,7 @@ public class DirectCensorScan extends Scan {
                 new ServerNetworkInformation(
                         chosenIp, getAutonomousSystemListFromIp(ipRangeFile, ip), "unknown");
 
-        ServerScan serverScan = new ServerScan(serverNetworkInformation, config);
+        ServerScan serverScan = new ServerScan(serverNetworkInformation, censorScannerConfig);
         LOGGER.info(
                 "Started scanning '{}' ({})",
                 scanJob.getScanTarget(),

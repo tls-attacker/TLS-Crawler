@@ -43,7 +43,10 @@ public class Main {
                                         workerCommandConfig.getRabbitMqDelegate()),
                                 new MongoPersistenceProvider(
                                         workerCommandConfig.getMongoDbDelegate()),
-                                workerCommandConfig.getCensorScanDelegate().getIpRangesFile());
+                                workerCommandConfig.getCensorScanDelegate().getIpRangesFile(),
+                                workerCommandConfig
+                                        .getCensorScanDelegate()
+                                        .getCensorScannerConfig());
                 worker.start();
                 break;
             case "controller":
