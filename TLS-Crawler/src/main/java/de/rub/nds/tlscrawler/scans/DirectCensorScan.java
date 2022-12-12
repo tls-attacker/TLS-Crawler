@@ -134,9 +134,9 @@ public class DirectCensorScan extends Scan {
         for (String ipRangeData : ipRangesData) {
             String[] data = ipRangeData.split("\\|");
             String ipRange = data[0];
-            String asNumber = data[1];
-            String countryCode = data[2];
-            String asName = data[3];
+            String asNumber = (data.length > 1 ? data[1] : "-1");
+            String countryCode = (data.length > 2 ? data[2] : "");
+            String asName = (data.length > 3 ? data[3] : "");
 
             if (new IPAddressString(ipRange).contains(new IPAddressString(ip))) {
                 autonomousSystems.add(
