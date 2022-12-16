@@ -18,7 +18,6 @@ import de.rub.nds.tlscrawler.scans.PingScan;
 import de.rub.nds.tlscrawler.scans.Scan;
 import de.rub.nds.tlscrawler.scans.TlsScan;
 import java.util.concurrent.*;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
