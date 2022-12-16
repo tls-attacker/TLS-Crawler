@@ -86,6 +86,9 @@ public class DirectCensorScan extends Scan {
                         scanJob.getCollectionName());
                 scanJob.setStatus(Status.DoneResultWritten);
             } else {
+                LOGGER.warn(
+                        "Scanning of {} had to be aborted because of a timeout: ",
+                        scanJob.getScanTarget());
                 scanJob.setStatus(Status.DoneNoResult);
             }
         } catch (Throwable e) {
