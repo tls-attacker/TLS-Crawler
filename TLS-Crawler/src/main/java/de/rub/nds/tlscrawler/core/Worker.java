@@ -9,6 +9,7 @@
 package de.rub.nds.tlscrawler.core;
 
 import de.rub.nds.censor.config.CensorScannerConfig;
+import de.rub.nds.censor.constants.CensorScanType;
 import de.rub.nds.tlscrawler.config.WorkerCommandConfig;
 import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
@@ -100,7 +101,16 @@ public class Worker extends TlsCrawler {
                                             censorScannerConfig));
                             break;
                         case TLS_CENSOR_ECHO:
-                            throw new NotImplementedException("Not implemented yet!");
+                            censorScannerConfig.setCensorScanType(CensorScanType.ECHO);
+                            this.submitWithTimeout(
+                                    new DirectCensorScan(
+                                            scanJob,
+                                            deliveryTag,
+                                            orchestrationProvider,
+                                            persistenceProvider,
+                                            ipRangeFile,
+                                            censorScannerConfig));
+                            break;
                         case PING:
                             this.submitWithTimeout(
                                     new PingScan(
