@@ -1,6 +1,7 @@
 version: '2.1'
 services:
   rabbitmq:
+    network_mode: "host"
     image: rabbitmq:3-management
     volumes:
       - "./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"
@@ -8,14 +9,15 @@ services:
     ports:
       - 127.0.0.1:5672:5672
       - 127.0.0.1:15672:15672
-    networks:
-      - crawler_overlay
+    # networks:
+      # - crawler_overlay
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 5s
       timeout: 30s
       retries: 5
   mongo:
+    network_mode: "host"
     image: mongo:latest
     volumes:
       - "./mongodata:/data/db"
@@ -24,9 +26,10 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: mongoadminpw
     ports:
       - 127.0.0.1:27017:27017
-    networks:
-      - crawler_overlay
+    # networks:
+      # - crawler_overlay
   controller:
+    network_mode: "host"
     cap_add:
       - NET_RAW
       - NET_ADMIN
@@ -45,23 +48,24 @@ services:
         SCANNER_BRANCH: ${SCANNER_BRANCH}
     restart: "no"
     command: controller
-      -hostFile resources/tls_ips.txt
+      -hostFile resources/echo_ip_example.txt
       -denylist resources/denylist.txt
       -portToBeScanned 443
-      -mongoDbHost mongo -mongoDbPort 27017 -mongoDbUser mongoadmin -mongoDbPass mongoadminpw
+      -mongoDbHost localhost -mongoDbPort 27017 -mongoDbUser mongoadmin -mongoDbPass mongoadminpw
       -mongoDbAuthSource admin
-      -rabbitMqHost rabbitmq -rabbitMqPort 5672
-      -scanName scanResults
-      -scanType TLS_CENSOR_DIRECT
+      -rabbitMqHost localhost -rabbitMqPort 5672
+      -scanName echoScan
+      -scanType TLS_CENSOR_ECHO
       -monitorScan
     volumes:
       - "./resources:/resources"
-    networks:
-      - crawler_overlay
+    # networks:
+      # - crawler_overlay
     depends_on:
       rabbitmq:
         condition: service_healthy
   worker:
+    network_mode: "host"
     cap_add:
       - NET_RAW
       - NET_ADMIN
@@ -80,21 +84,21 @@ services:
         SCANNER_BRANCH: ${SCANNER_BRANCH}
     command: worker
       -ipRangesFile resources/ip_range_as_map.txt
-      -mongoDbHost mongo -mongoDbPort 27017
+      -mongoDbHost localhost -mongoDbPort 27017
       -mongoDbUser mongoadmin -mongoDbPass mongoadminpw -mongoDbAuthSource admin
-      -rabbitMqHost rabbitmq -rabbitMqPort 5672
+      -rabbitMqHost localhost -rabbitMqPort 5672
       -numberOfThreads 100
       -parallelProbeThreads 100
-      -scanTimeout 3500000
+      -scanTimeout 4000000
       -outputFolder /CensorScanner/output
       -censorshipAttempts 5
       -sniHostNames twitter.com,example.org
-      -socketTimeout 30000
+      -socketTimeout 10000
     volumes:
       - "./resources:/resources"
       - "./static_saves:/CensorScanner/output"
-    networks:
-      - crawler_overlay
+    # networks:
+      # - crawler_overlay
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -102,5 +106,5 @@ volumes:
   mongodata:
   static_saves:
 
-networks:
-  crawler_overlay:
+# networks:
+#   crawler_overlay:
