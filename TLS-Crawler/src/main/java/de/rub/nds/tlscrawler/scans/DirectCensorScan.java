@@ -11,10 +11,7 @@ package de.rub.nds.tlscrawler.scans;
 import de.rub.nds.censor.config.CensorScannerConfig;
 import de.rub.nds.censor.execution.ServerScan;
 import de.rub.nds.censor.execution.result.ServerScanResult;
-import de.rub.nds.censor.network.AutonomousSystem;
-import de.rub.nds.censor.network.IpAddress;
-import de.rub.nds.censor.network.Ipv4Address;
-import de.rub.nds.censor.network.ServerNetworkInformation;
+import de.rub.nds.censor.network.*;
 import de.rub.nds.tlscrawler.constant.Status;
 import de.rub.nds.tlscrawler.data.ScanJob;
 import de.rub.nds.tlscrawler.data.ScanResult;
@@ -61,7 +58,7 @@ public class DirectCensorScan extends Scan {
             IpAddress chosenIp = new Ipv4Address(ip);
             ServerNetworkInformation serverNetworkInformation =
                     new ServerNetworkInformation(
-                            chosenIp, getAutonomousSystemListFromIp(ipRangeFile, ip), "unknown");
+                            chosenIp, getRoutesForIp(ipRangeFile, ip), "unknown");
 
             ServerScan serverScan = new ServerScan(serverNetworkInformation, censorScannerConfig);
             LOGGER.info(
@@ -115,17 +112,17 @@ public class DirectCensorScan extends Scan {
     }
 
     /**
-     * Returns a list of autonomous systems for the given IP Address. Sorts the list by containment
+     * Returns a list of IP ranges/routes for the given IP Address. Sorts the list by containment
      * of Ip address in different ranges and their size.
      *
      * @param ipRangeFile The file containing information about ipRanges and their Autonomous
      *     Systems
      * @param ip Ip Address to get autonomous systems for
-     * @return List of {@link AutonomousSystem} sorted by their size
+     * @return List of {@link IpRange} sorted by their size
      */
-    private List<AutonomousSystem> getAutonomousSystemListFromIp(String ipRangeFile, String ip) {
+    private List<IpRange> getRoutesForIp(String ipRangeFile, String ip) {
 
-        List<AutonomousSystem> autonomousSystems = new LinkedList<>();
+        List<IpRange> ipRanges = new LinkedList<>();
         List<String> ipRangesData;
         try (Stream<String> lines = Files.lines(Paths.get(ipRangeFile))) {
             ipRangesData = lines.collect(Collectors.toList());
@@ -136,21 +133,22 @@ public class DirectCensorScan extends Scan {
         for (String ipRangeData : ipRangesData) {
             String[] data = ipRangeData.split("\\|");
             String ipRange = data[0];
-            String asNumber = (data.length > 1 ? data[1] : "-1");
+            String ipRangeInformation = (data.length > 1 ? data[1] : "-1");
             String countryCode = (data.length > 2 ? data[2] : "");
-            String asName = (data.length > 3 ? data[3] : "");
+            String asNumber = (data.length > 3 ? data[3] : "-1");
+            String asName = (data.length > 4 ? data[4] : "");
+            String asInformation = (data.length > 5 ? data[5] : "");
 
             if (new IPAddressString(ipRange).contains(new IPAddressString(ip))) {
-                autonomousSystems.add(
-                        new AutonomousSystem(
-                                Integer.parseInt(asNumber), countryCode, asName, ipRange));
+                AutonomousSystem autonomousSystem = new AutonomousSystem(Integer.parseInt(asNumber), countryCode, asInformation, asName);
+                ipRanges.add(new IpRange(ipRange, ipRangeInformation, autonomousSystem));
             }
         }
 
-        autonomousSystems.sort(
+        ipRanges.sort(
                 (o1, o2) -> {
-                    IPAddressString range1 = new IPAddressString(o1.getIpRange());
-                    IPAddressString range2 = new IPAddressString(o2.getIpRange());
+                    IPAddressString range1 = new IPAddressString(o1.getRange());
+                    IPAddressString range2 = new IPAddressString(o2.getRange());
 
                     if (range1.contains(range2)) {
                         return 1;
@@ -161,14 +159,13 @@ public class DirectCensorScan extends Scan {
                     } else {
                         throw new RuntimeException(
                                 "Cannot compare "
-                                        + o1.getIpRange()
+                                        + o1.getRange()
                                         + " and "
-                                        + o2.getIpRange()
+                                        + o2.getRange()
                                         + " as none contains the other.");
                     }
                 });
-
-        return autonomousSystems;
+        return ipRanges;
     }
 
     private Document createDocumentFromServerResult(ServerScanResult result) {
