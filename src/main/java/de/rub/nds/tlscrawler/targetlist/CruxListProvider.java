@@ -21,7 +21,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
+
+import de.rub.nds.tlscrawler.constant.CruxListNumber;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,35 +32,34 @@ import org.apache.logging.log4j.Logger;
  * Target list provider that downloads the most recent tranco list (https://tranco-list.eu/) and
  * extracts the top x hosts from it.
  */
-public class TrancoListProvider implements ITargetListProvider {
+public class CruxListProvider implements ITargetListProvider {
 
-    private static final String SOURCE = "https://tranco-list.eu/top-1m.csv.zip";
-    private static final String ZIP_FILENAME = "tranco-1m.csv.zip";
-    private static final String FILENAME = "tranco-1m.csv";
+    private static final String SOURCE = "https://raw.githubusercontent.com/zakird/crux-top-lists/main/data/global/current.csv.gz";
+    private static final String ZIP_FILENAME = "current.csv.gz";
+    private static final String FILENAME = "current.csv";
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final int number;
 
-    public TrancoListProvider(int number) {
-        this.number = number;
+    public CruxListProvider(CruxListNumber cruxListNumber) {
+        this.number = cruxListNumber.getNumber();
     }
 
     @Override
     public List<String> getTargetList() {
         List<String> targetList;
         try {
-            LOGGER.info("Downloading current Tranco list...");
+            LOGGER.info("Downloading current Crux list...");
             ReadableByteChannel readableByteChannel =
                     Channels.newChannel(new URL(SOURCE).openStream());
             FileOutputStream fileOutputStream = new FileOutputStream(ZIP_FILENAME);
             fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             fileOutputStream.close();
         } catch (IOException e) {
-            LOGGER.error("Could not download the current Tranco list with error ", e);
+            LOGGER.error("Could not download the current Crux list with error ", e);
         }
-        LOGGER.info("Unzipping current Tranco list...");
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(ZIP_FILENAME))) {
-            zis.getNextEntry();
+        LOGGER.info("Unzipping current Crux list...");
+        try (GZIPInputStream zis = new GZIPInputStream(new FileInputStream(ZIP_FILENAME))) {
             File newFile = new File(FILENAME);
             // write file content
             FileOutputStream fos = new FileOutputStream(newFile);
@@ -68,11 +70,14 @@ public class TrancoListProvider implements ITargetListProvider {
             }
             fos.close();
         } catch (IOException e) {
-            LOGGER.error("Could not unzip the current Tranco list with error ", e);
+            LOGGER.error("Could not unzip the current Crux list with error ", e);
         }
-        LOGGER.info("Reading first {} host from current Tranco list...", number);
+        LOGGER.info("Reading first {} host from current Crux list...", number);
+        // currently hosts are in order. e.g. top 1000 hosts come first but that does not have to be the case
+        // therefore, we parse every line until we hit the specified number of hosts
         try (Stream<String> lines = Files.lines(Paths.get(FILENAME))) {
-            targetList = lines.limit(this.number).collect(Collectors.toList());
+            // filter to all correctly ranked hosts, ignore RAW http hosts and map to final domain
+            targetList = lines.filter(line -> line.contains("https://")).filter(line -> Integer.parseInt(line.split("\\,")[1]) <= number).map(line -> line.split("\\,")[0].split(":\\/\\/")[1]).collect(Collectors.toList());
         } catch (IOException ex) {
             throw new RuntimeException("Could not load " + FILENAME, ex);
         }
