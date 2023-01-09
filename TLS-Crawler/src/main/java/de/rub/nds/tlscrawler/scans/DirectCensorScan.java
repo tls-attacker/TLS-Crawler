@@ -112,8 +112,8 @@ public class DirectCensorScan extends Scan {
     }
 
     /**
-     * Returns a list of IP ranges/routes for the given IP Address. Sorts the list by containment
-     * of Ip address in different ranges and their size.
+     * Returns a list of IP ranges/routes for the given IP Address. Sorts the list by containment of
+     * Ip address in different ranges and their size.
      *
      * @param ipRangeFile The file containing information about ipRanges and their Autonomous
      *     Systems
@@ -140,7 +140,9 @@ public class DirectCensorScan extends Scan {
             String asInformation = (data.length > 5 ? data[5] : "");
 
             if (new IPAddressString(ipRange).contains(new IPAddressString(ip))) {
-                AutonomousSystem autonomousSystem = new AutonomousSystem(Integer.parseInt(asNumber), countryCode, asInformation, asName);
+                AutonomousSystem autonomousSystem =
+                        new AutonomousSystem(
+                                Integer.parseInt(asNumber), countryCode, asInformation, asName);
                 ipRanges.add(new IpRange(ipRange, ipRangeInformation, autonomousSystem));
             }
         }
