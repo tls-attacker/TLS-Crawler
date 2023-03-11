@@ -19,6 +19,7 @@ import de.rub.nds.tlscrawler.orchestration.RabbitMqOrchestrationProvider;
 import de.rub.nds.tlscrawler.persistence.IPersistenceProvider;
 import inet.ipaddr.IPAddressString;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -124,7 +125,7 @@ public class DirectCensorScan extends Scan {
 
         List<IpRange> ipRanges = new LinkedList<>();
         List<String> ipRangesData;
-        try (Stream<String> lines = Files.lines(Paths.get(ipRangeFile))) {
+        try (Stream<String> lines = Files.lines(Paths.get(ipRangeFile), StandardCharsets.ISO_8859_1)) {
             ipRangesData = lines.collect(Collectors.toList());
         } catch (IOException ex) {
             throw new RuntimeException("Could not load " + ipRangeFile, ex);
