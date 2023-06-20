@@ -100,7 +100,7 @@ public class Worker extends TlsCrawler {
                                             censorScannerConfig));
                             break;
                         case TLS_CENSOR_ECHO:
-                            censorScannerConfig.setCensorScanType(CensorScanType.ECHO);
+                            censorScannerConfig.censorScanType = CensorScanType.ECHO;
                             this.submitWithTimeout(
                                     new DirectCensorScan(
                                             scanJob,

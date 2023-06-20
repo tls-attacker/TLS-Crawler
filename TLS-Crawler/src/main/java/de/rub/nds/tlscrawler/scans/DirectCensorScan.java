@@ -125,7 +125,8 @@ public class DirectCensorScan extends Scan {
 
         List<IpRange> ipRanges = new LinkedList<>();
         List<String> ipRangesData;
-        try (Stream<String> lines = Files.lines(Paths.get(ipRangeFile), StandardCharsets.ISO_8859_1)) {
+        try (Stream<String> lines =
+                Files.lines(Paths.get(ipRangeFile), StandardCharsets.ISO_8859_1)) {
             ipRangesData = lines.collect(Collectors.toList());
         } catch (IOException ex) {
             throw new RuntimeException("Could not load " + ipRangeFile, ex);

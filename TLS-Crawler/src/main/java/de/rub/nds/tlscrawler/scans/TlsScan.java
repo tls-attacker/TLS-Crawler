@@ -49,7 +49,6 @@ public class TlsScan extends Scan {
             generalDelegate.setQuiet(true);
 
             ServerScannerConfig config = new ServerScannerConfig(generalDelegate);
-            config.setScanDetail(scanJob.getScanConfig().getScannerDetail());
             config.setTimeout(scanJob.getScanConfig().getTimeout());
             config.getClientDelegate()
                     .setHost(
