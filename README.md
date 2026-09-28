@@ -1,3 +1,10 @@
+# ℹ️ Archived / Repo Moved ℹ️
+
+**This repo was merged into [TLS-Scanner](https://github.com/tls-attacker/TLS-Scanner)**.
+NB: This move caused a version jump in the crawler and a change in the dependency definition. Check the pom.xml in the new repo for up-to-date information.
+
+---
+
 # TLS-Crawler
 
 The TLS-Crawler is designed to perform large scale scans with [TLS-Scanner](https://github.com/tls-attacker/TLS-Scanner).
